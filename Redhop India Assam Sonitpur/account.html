@@ -1,0 +1,185 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>User Account | redhop</title>  
+    <link rel="stylesheet" href="styles.css">  
+      <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let verifiedUntil = localStorage.getItem("user_verified");
+      let name = localStorage.getItem("user_name");
+      let phone = localStorage.getItem("user_phone");
+      let email = localStorage.getItem("user_email");
+
+      if (!verifiedUntil || new Date().getTime() > verifiedUntil) {
+        localStorage.clear();
+        window.location.href = "login.html"; // Redirect if not logged in
+      } else {
+        document.getElementById("user-name").innerText = name || "N/A";
+        document.getElementById("user-phone").innerText = phone || "N/A";
+        document.getElementById("user-email").innerText = email || "N/A";
+        document.getElementById("welcome-title").innerText = "Welcome " + (name || "");
+      }
+    });
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</head>  
+<body>  
+    <!-- Header -->  
+    <header class="header">  
+      <!-- Delivery Boy Image -->  
+        <img src="delivery boy.png" alt="Delivery Boy" class="delivery-boy">  
+    <div class="logo">  
+       <div class="logo-container">  
+        <div class="golden-ring"></div>  
+        <div class="logo-wrapper">  
+           <a href="index.html"><img src="logu.png" alt="Logo" class="luxury-logo"></a>  
+        </div>  
+        <div class="sparkles"></div>  
+        <div class="soft-glow"></div>  <div class="light"></div>  
+    <div class="particles"></div>  
+</div>  
+      
+    <h1 class="brand-name">  
+      <div class="logo-container">  
+<h1 class="animated-logo">  
+     <span>R</span>  
+    <span>E</span>  
+    <span>D</span>  
+    <span>H</span>  
+    <span>O</span>  
+    <span>P</span> 
+</h1>
+
+</div>  
+        </h1>  
+    </div>  
+     <nav class="nav-options">
+   
+  <a href="your cart.html">
+      <img src="your cart.png" alt="your cart"style="width: 20px;">  </a>
+    </nav>
+        <nav class="nav-options">
+            <button id="hamburger-btn" class="hamburger-btn">
+                &#9776; <!-- Hamburger Icon -->
+            </button>
+        </nav>
+     </header>  
+ <!-- Subheader --><!-- Subheader -->
+ <div id="side-menu" class="side-menu"></div>
+
+
+<section class="features-section" id="features">  
+    <ul>  
+      <li>  
+        <div class="container">
+          
+            <center>
+              <h2 id="welcome-title">Welcome</h2>
+            </center>
+           
+              <p><strong>Name :</strong> <span id="user-name"></span></p>
+              <p><strong>Phone:</strong> <span id="user-phone"></span></p>
+              <p><strong>Email:</strong> <span id="user-email"></span></p>
+             <center>
+                <buttons onclick="logout()">Logout</buttons>
+             </center>
+            
+         
+        </div>
+      </li>  
+    </ul>  
+  </section> 
+  
+  <center><h2>My Orders</h2></center>
+  <div class="category-card">
+ 
+  <div id="orderList"></div>
+  <div id="orders-container"></div>
+    </div>
+
+
+  
+  <!-- Footer -->  
+<footer class="footer">  
+<div class="footer-info">  
+    <div>  
+        <h3>Contact Us</h3>  
+        <a id="contact-email" href="#" style="color: white;"></a>  
+    </div>  
+    <div>  
+        <h3>About Us</h3>  
+        <p id="about"></p>  
+    </div>  
+    <p id="copyright"></p>  
+    <nav>  
+        <a href="privacypolicy.html" style="color: white;">Privacy Policy</a>  
+        <a href="t&c.html" style="color: white;">T&C</a>  
+        <a href="index.html" style="color: white;">Home</a>  
+    </nav>  
+</div>
+
+</footer> 
+<script src="app.js" defer></script>
+ <script>
+    const orders = JSON.parse(localStorage.getItem('pastOrders')) || [];
+    const orderList = document.getElementById('orderList');
+
+    if (orders.length === 0) {
+        orderList.innerHTML = "<p>No past orders found.</p>";
+    } else {
+        orders.reverse().forEach(order => {
+            orderList.innerHTML += `
+                <div class="order-item">
+                    <a href="${order.name}.html" target="_blank">
+            <img src="${order.image}" alt="${order.name}">
+        </a>
+                    <p><a href="${order.name}.html" target="_blank" style="color: black; text-decoration: none;">${order.name}</a></p>
+                    <p><strong>Price:</strong> ₹${order.price}</p>
+                    <p><strong>Quantity:</strong> ${order.quantity}</p>
+                    <p><strong>Total:</strong> ₹${order.total}</p>
+                    <p><strong>Date & Time:</strong> ${order.dateTime}</p>
+                </div>
+                <br> <hr>
+            `;
+        });
+    }
+  </script>
+   <script>
+    window.onload = function () {
+      const orders = JSON.parse(localStorage.getItem("yourOrders")) || [];
+      const container = document.getElementById("orders-container");
+
+      if (orders.length === 0) {
+        container.innerHTML = "<p>You have no orders yet.</p>";
+        return;
+      }
+
+      orders.reverse().forEach(order => {
+        let html = `<div class="order-card"><h3>Order Date: ${order.date} ${order.time}</h3>`;
+        order.products.forEach(product => {
+          html += `
+            <div class="product-item">
+              <a href="${product.name}.html" target="_blank">
+            <img src="${product.image}" alt="${product.name}">
+        </a>
+              <p><a href="${product.name}.html" target="_blank" style="color: black; text-decoration: none;">${product.name}</a></p>
+              <p>Price: ₹${product.price}</p>
+            </div>
+            <br> <hr>
+          `;
+        });
+        html += `<h4>Total: ₹${order.totalPrice}</h4></div><hr>`;
+        container.innerHTML += html;
+        
+      });
+    };
+  </script>
+   
+
+</body>  
+</html>  
