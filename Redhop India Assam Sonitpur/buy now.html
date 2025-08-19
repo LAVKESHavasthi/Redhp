@@ -2,8 +2,8 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <meta name="description" content="Welcome to redhope, your one-stop destination for fast and reliable shopping.">  
-    <title>redhope - Shop Smarter, Faster!</title>  
+    <meta name="description" content="Welcome to redhop, your one-stop destination for fast and reliable shopping.">  
+    <title>redhop - Shop Smarter, Faster!</title>  
     <link rel="stylesheet" href="styles.css">  
      <script>  
      function updateQuantity(change) {
@@ -87,8 +87,8 @@
                     <input type="text" id="pincode" placeholder="Enter your pincode">
                     <br><br>  
 
-                    <label for="redhopeCode">redhope Code:</label>  
-                    <input type="text" id="redhopeCode" placeholder="Enter redhope Code (optional)"><br><br> 
+                    <label for="redhopCode">redhop Code:</label>  
+                    <input type="text" id="redhopCode" placeholder="Enter redhop Code (optional)"><br><br> 
                     <hr>
 
                     <center><h3>🚚 Select Delivery Methods</h3></center>  
@@ -118,7 +118,7 @@
                     document.getElementById('post').value = savedDetails.post || "";
                     document.getElementById('address').value = savedDetails.address || "";
                     document.getElementById('pincode').value = savedDetails.pincode || "";
-                    document.getElementById('redhopeCode').value = savedDetails.redhopeCode || "";
+                    document.getElementById('redhopCode').value = savedDetails.redhopCode || "";
                 }
             }
         };  
@@ -131,7 +131,7 @@
             const post = document.getElementById('post').value;
             const address = document.getElementById('address').value;  
             const pincode = document.getElementById('pincode').value;  
-            const redhopeCode = document.getElementById('redhopeCode').value;  
+            const redhopCode = document.getElementById('redhopCode').value;  
             const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;  
 
             if (quantity <= 0) {  
@@ -139,8 +139,8 @@
                 return;
             }
 
-            if ((!tehsil || !post ||  !address || !pincode) && !redhopeCode) {  
-                alert("Please fill in either all fields (Tehsil, Area/Post/village,Address, Pincode) or only redhope Code.");  
+            if ((!tehsil || !post ||  !address || !pincode) && !redhopCode) {  
+                alert("Please fill in either all fields (Tehsil, Area/Post/village,Address, Pincode) or only redhop Code.");  
                 return;  
             }  
 
@@ -155,14 +155,14 @@
                 post,
                 address,  
                 pincode,  
-                redhopeCode,  
+                redhopCode,  
                 deliveryMethod,  
                 deliveryCharges,  
                 totalPrice  
             };  
 
             // Save customer details in localStorage  
-            const customerDetails = {tehsil,post,address, pincode, redhopeCode };
+            const customerDetails = {tehsil,post,address, pincode, redhopCode };
             localStorage.setItem("customerDetails", JSON.stringify(customerDetails));
 
             sessionStorage.setItem("orderData", JSON.stringify(orderData));  
