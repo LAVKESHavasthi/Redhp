@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="redhope - Shop smarter, faster! Get groceries, general items, vegetables, and fruits delivered to your doorstep within 25 minutes across India.">
+    <meta name="keywords" content="redhope, e-commerce, fast delivery, online shopping, groceries, home products, shop products, Bharatpur, India, redhope shopping, quick delivery">
+    <meta name="author" content="redhope">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ff6600">
+    <meta property="og:title" content="redhope - Shop Smarter, Faster!">
+    <meta property="og:description" content="Your one-stop destination for groceries, general items, and more. Fast delivery across India in just 199 minutes!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://redhope.netlify.app/">
+    <meta property="og:image" content="https://redhope.netlify.app/banner1.jpg">
+    <meta property="og:site_name" content="redhope">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="redhope - Shop Smarter, Faster!">
+    <meta name="twitter:description" content="Fast delivery of home and shop essentials within 199 minutes across India.">
+    <meta name="twitter:image" content="https://redhope.netlify.app/banner1.jpg">
+    <meta name="twitter:site" content="@redhope">
+    <link rel="canonical" href="https://redhope.netlify.app/">
+    
+    <link rel="stylesheet" href="styles.css">
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "redhope",
+      "url": "https://redhope.netlify.app/",
+      "logo": "https://redhope.netlify.app/logu.png",
+      "description": "redhope is your one-stop destination for fast delivery of groceries, general items, vegetables, and fruits within 199 minutes anywhere in India.",
+      "sameAs": [
+        "https://x.com/redhopeOfficial?t=V81Lj9qZ_QUAqgv2upQ6KQ&s=09",
+        "https://www.instagram.com/redhopeofficial?igsh=MWhrOWI1dHVyazhuZw==",
+        "https://www.facebook.com/share/165KR9EFkc/"
+      ]
+    }
+    </script>
+   
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const country = localStorage.getItem("selectedCountry");
+    const state = localStorage.getItem("selectedState");
+    const district = localStorage.getItem("selectedDistrict");
+
+    // Check if the user is coming from inside the website
+    const isInternalNavigation = sessionStorage.getItem("internalNavigation");
+
+    if (country && state && district && !isInternalNavigation) {
+        // Redirect to the saved district's index page if coming from outside
+        const url = `redhope%20${country}%20${state}%20${district}/index.html`.replace(/ /g, "%20");
+        window.location.href = url;
+    } else {
+        // Remove the internal navigation flag when staying on the main page
+        sessionStorage.removeItem("internalNavigation");
+    }
+});
+</script>
+    <title>redhope - Shop Smarter, Faster!</title>
+    <link rel="icon" href="logu.png" type="image/png">
+  <link rel="shortcut icon" href="logu.png" type="image/png">
+  <link rel="apple-touch-icon" href="logu.png">
+
+  <!-- Your Organization Schema for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "redhope",
+    "url": "https://redhope.netlify.app/",
+    "logo": "https://redhope.netlify.app/logu.png"
+  }
+  </script>
+</head>
+<body>
+    
+    
+    <!-- Header -->
+    <header class="header">
+      <!-- Delivery Boy Image -->
+        
+    <div class="logo">
+       <div class="logo-container">
+        <div class="golden-ring"></div>
+        <div class="logo-wrapper">
+            <img src="logu.png" alt="Logo" class="luxury-logo">
+        </div>
+        <div class="sparkles"></div>
+        <div class="soft-glow"></div>
+        
+        <div class="light"></div>
+        <div class="particles"></div>
+    </div>
+        
+        <h1 class="brand-name">
+          <div class="logo-container">
+    <h1 class="animated-logo">
+        <span>R</span>
+        <span>E</span>
+        <span>D</span>
+        <span>H</span>
+        <span>O</span>
+        <span>P</span>
+        <span>E</span>
+    </h1>
+</div>
+        </h1>
+    </div>
+  
+     
+    </header>
+      <!-- Welcome Animation Overlay -->
+  <div id="welcome-overlay">
+    <div id="welcome-container">
+      <img id="welcome-image" src="logu.png" alt="redhope Logo">
+      <div id="welcome-text">Welcome to redhope</div>
+    </div>
+  </div>
+
+    
+
+    
+     <div class="animated-hr"></div>
+
+     <section class="features-section" id="features">
+    <ul>
+      <li>
+     
+      <div class="filter">
+     
+       <h3>Please Select Your Area: 🌍</h3>
+  <form>
+    <label for="country">Country: 🇮🇳</label>
+    <select id="country" onchange="updateStates()">
+        
+      <option value="">Select Country</option>
+      <option value="India">India</option>
+      
+    </select>
+
+    <br><br>
+
+    <label for="state">State: ⛳</label>
+    <select id="state" onchange="updateDistricts()">
+        
+      <option value="">Select State</option>
+    </select>
+
+    <br><br>
+
+    <label for="district">District:📍</label>
+    <select id="district">
+      <option value="">Select District</option>
+    </select>
+
+    <br><br>
+
+   <center> <buttons type="button" onclick="redirectToPage()">Next</buttons> </center>
+  
+  </form>
+
+      </div>
+          <center>
+    <a href="https://github.com/redhope/redhope/releases/download/v1.1.3/redhope.apk" 
+       class="download-btn" 
+       download 
+       style="display: inline-block; padding: 20px 40px; font-size: 24px; background-color: #A9A9A9; color: black; text-decoration: none; border-radius: 8px; font-weight: bold;">
+        Download redhope App
+    </a>
+</center>
+<h1></h1>
+
+  
+
+    <center>
+  <div class="testimonial-container">
+        <h2 class="testimonial-title">Testimonial</h2>
+        <div class="testimonial-slider">
+            <div class="testimonial-wrapper">
+    <div class="testimonial-slide">
+        <p class="testimonial-text">""</p>
+        <div class="testimonial-user">
+            <img src="profile1.jpg" alt="">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="testimonial-slide">
+        <p class="testimonial-text">""</p>
+        <div class="testimonial-user">
+            <img src="profile2.jpg" alt="Neha Verma">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="testimonial-slide">
+        <p class="testimonial-text">""</p>
+        <div class="testimonial-user">
+            <img src="profile3.jpg" alt="">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+
+        <div class="testimonial-controls">
+            <span class="prev">&#10094;</span>
+            <span class="next">&#10095;</span>
+        </div>
+
+        <div class="testimonial-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+    </center>
+    
+      </li>
+     </ul>
+     </section>
+
+
+    
+    <div class="animated-hr"></div>
+
+    <!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            
+        </div>
+        <div class="footer-section">
+        
+        <div class="footer-section">
+            <h3>Available In</h3>
+           
+           
+           
+           <div class="category-card" onclick="shopCategory('Groceries & Staples')">
+    <div class="section">
+        <div class="image">
+           <img src="map cover red.jpg"  alt="Available In">
+        </div>
+    </div>
+</div>
+           
+        </div>
+        <div class="footer-section social-links">
+            <h3>Social Links</h3>
+           <a href="https://www.instagram.com/redhopeofficial" target="_blank">Instagram</a>
+            <a href="https://x.com/redhopeOfficial?t=GE8GUaKOtH0MhrYaymCArA&s=09">Twitter</a>
+            <a href="https://www.facebook.com/share/165KR9EFkc/">Facebook</a>
+            <a href="mailto:redhopeOfficial@gmail.com">Email</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+
+        
+    </div>
+    <p><strong>&copy;2024-2025</strong> redhope. All rights reserved.</p>
+</footer>
+
+<script>
+    // Data for countries, states, and districts
+    const data = {
+      India: {
+        Assam: [
+        "Sonitpur"
+    ],
+        
+      },
+      
+    };
+
+    document.addEventListener("DOMContentLoaded", function () { const countrySelect = document.getElementById("country"); const stateSelect = document.getElementById("state"); const districtSelect = document.getElementById("district");
+
+// Load saved selections from localStorage
+const savedCountry = localStorage.getItem("selectedCountry");
+const savedState = localStorage.getItem("selectedState");
+const savedDistrict = localStorage.getItem("selectedDistrict");
+
+if (savedCountry) {
+    countrySelect.value = savedCountry;
+    updateStates();
+    
+    if (savedState) {
+        stateSelect.value = savedState;
+        updateDistricts();
+        
+        if (savedDistrict) {
+            districtSelect.value = savedDistrict;
+        }
+    }
+}
+
+});
+
+function updateStates() { const countrySelect = document.getElementById("country"); const stateSelect = document.getElementById("state"); const districtSelect = document.getElementById("district");
+
+const selectedCountry = countrySelect.value;
+stateSelect.innerHTML = "<option value=''>Select State</option>";
+districtSelect.innerHTML = "<option value=''>Select District</option>";
+
+if (selectedCountry && data[selectedCountry]) {
+    Object.keys(data[selectedCountry]).forEach((state) => {
+        const option = document.createElement("option");
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+    });
+}
+
+}
+
+function updateDistricts() { const countrySelect = document.getElementById("country"); const stateSelect = document.getElementById("state"); const districtSelect = document.getElementById("district");
+
+const selectedCountry = countrySelect.value;
+const selectedState = stateSelect.value;
+districtSelect.innerHTML = "<option value=''>Select District</option>";
+
+if (selectedCountry && selectedState && data[selectedCountry][selectedState]) {
+    data[selectedCountry][selectedState].forEach((district) => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+    });
+}
+
+}
+
+function redirectToPage() { const country = document.getElementById("country").value; const state = document.getElementById("state").value; const district = document.getElementById("district").value;
+
+if (country && state && district) {
+    // Save selections in localStorage
+    localStorage.setItem("selectedCountry", country);
+    localStorage.setItem("selectedState", state);
+    localStorage.setItem("selectedDistrict", district);
+    
+    const url = `redhope%20${country}%20${state}%20${district}/index.html`.replace(/ /g, "%20");
+    window.location.href = url;
+} else {
+    alert("Please select all options.");
+}
+
+}
+
+
+  </script>
+    <script>
+
+       const slides = document.querySelectorAll(".testimonial-slide");
+const wrapper = document.querySelector(".testimonial-wrapper");
+const prevBtn = document.querySelector(".prev");
+const nextBtn = document.querySelector(".next");
+const dots = document.querySelectorAll(".dot");
+
+let currentIndex = 0;
+
+function updateSlider() {
+    wrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+    slides.forEach((slide, i) => {
+        slide.classList.remove("active");
+        dots[i].classList.remove("active");
+        if (i === currentIndex) {
+            slide.classList.add("active");
+            dots[i].classList.add("active");
+        }
+    });
+}
+
+prevBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+    updateSlider();
+});
+
+nextBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+    updateSlider();
+});
+
+dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+        currentIndex = i;
+        updateSlider();
+    });
+});
+
+setInterval(() => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    updateSlider();
+}, 5000);
+
+// Initialize first slide
+updateSlider(); 
+    </script>
+    
+
+    
+    
+</body>
+</html>
+
