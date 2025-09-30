@@ -1,91 +1,678 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>REDHOP</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="app.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>REDHOP — Health & Blood Network (Pure JS/CSS)</title>
+
+  <style>
+    /* ---------- Theme vars ---------- */
+    :root{
+      --color-primary: #071430;
+      --color-secondary: #00C0B3;
+      --color-danger: #E63B3B;
+      --color-surface: #F7FAFC;
+      --glass: rgba(255,255,255,0.72);
+      --muted: #6b7280;
+      --card-shadow: 0 12px 30px rgba(2,6,23,0.06);
+      --glass-border: rgba(9,20,40,0.04);
+      --radius: 12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--color-surface);
+      color:var(--color-primary);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+
+    /* ---------- layout ---------- */
+    header.top-bar{
+      position:sticky; top:0; z-index:60;
+      background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--glass-border);
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .logo { display:flex; align-items:center; gap:12px; cursor:pointer }
+    .logo .badge{
+      width:44px; height:44px; border-radius:12px;
+      background: linear-gradient(45deg,#ef4444,#dc2626);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+    .logo .txt { line-height:1 }
+    .logo .txt .title{ display:block; font-weight:800; font-size:18px; letter-spacing:-0.4px; color:var(--color-primary) }
+    .logo .txt .tag{ display:block; font-size:11px; color:#9aa0a6; margin-top:2px }
+
+    .header-actions { display:flex; align-items:center; gap:12px }
+
+    /* ---------- content ---------- */
+    main#app-content{ padding-bottom:120px; min-height:calc(100vh - 76px) }
+
+    .page { padding:16px; max-width:900px; margin:0 auto }
+    .search-box { display:flex; gap:8px; align-items:center; background:white; padding:12px; border-radius:14px; box-shadow:var(--card-shadow); border:1px solid var(--glass-border) }
+    .search-box input{
+      border:0; outline:none; font-size:15px; flex:1; padding:6px 6px;
+      background:transparent;
+    }
+    .search-box .btn {
+      width:44px; height:44px; border-radius:10px; background:var(--color-primary); color:white;
+      display:flex; align-items:center; justify-content:center; border:0; cursor:pointer;
+      box-shadow:0 8px 20px rgba(2,6,23,0.06);
+    }
+
+    /* suggestions */
+    .search-wrapper { position:relative; width:100% }
+    .suggestions {
+      position:absolute; left:0; right:0; top:calc(100% + 10px); z-index:50;
+      background:#fff; border-radius:12px; box-shadow:0 16px 40px rgba(2,6,23,0.06);
+      border:1px solid var(--glass-border); overflow:hidden;
+    }
+    .suggestions .item{ padding:10px 12px; cursor:pointer; font-size:14px; color:var(--color-primary) }
+    .suggestions .item:hover{ background:#f3f6f8 }
+
+    /* slider */
+    .slider-container{ margin-top:12px; border-radius:14px; overflow:hidden; position:relative }
+    .slider-track { display:flex; gap:12px; transition:transform .65s cubic-bezier(.2,.9,.25,1); padding:8px }
+    .slide { flex:0 0 86%; min-width:220px; max-width:520px; border-radius:12px; padding:16px; color:#fff; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--card-shadow) }
+    @media(min-width:760px){ .slide { flex:0 0 32% } }
+    .si-accent { background: linear-gradient(135deg,var(--color-secondary), #00A9E6); }
+    .si-danger { background: linear-gradient(135deg,var(--color-danger), #c13a3a); }
+    .si-primary{ background: linear-gradient(135deg,#0b2540,#083155); }
+    .slider-dots { display:flex; gap:8px; justify-content:center; margin-top:10px }
+    .slider-dots button{ width:8px; height:8px; border-radius:20px; background:rgba(255,255,255,0.5); border:0; cursor:pointer; opacity:.9 }
+    .slider-dots button.active{ transform:scale(1.25); background:#fff; box-shadow:0 8px 20px rgba(0,0,0,0.12) }
+
+    /* sections */
+    h2.section-title { margin:18px 0 8px; font-size:20px }
+    .grid { display:grid; gap:12px }
+    .grid.cols-3 { grid-template-columns: repeat(1,1fr) }
+    @media(min-width:760px){ .grid.cols-3 { grid-template-columns: repeat(3,1fr) } }
+    .card { background:#fff; padding:16px; border-radius:14px; box-shadow:var(--card-shadow); display:flex; gap:12px; align-items:center; cursor:pointer; transition:transform .14s ease, box-shadow .14s ease; border:1px solid transparent }
+    .card:hover{ transform:translateY(-4px); box-shadow:0 18px 40px rgba(2,6,23,0.08) }
+    .card .icon { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:18px }
+    .icon.teal{ background:linear-gradient(135deg,#2dd4bf,#38bdf8) }
+    .icon.red{ background:linear-gradient(135deg,#ef4444,#fb7185) }
+    .icon.dark{ background:#ef4444 }
+
+    /* chat trigger */
+    #chatbot-trigger{ position:fixed; right:16px; bottom:120px; width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; background:var(--color-secondary); color:white; border:0; box-shadow:0 18px 40px rgba(0,0,0,0.16); cursor:pointer; z-index:40 }
+
+    /* chat modal */
+    #chatbot-modal{ position:fixed; inset:0; display:flex; align-items:flex-end; justify-content:center; z-index:50; background:rgba(0,0,0,0.42) }
+    #chatbot-modal .panel{ width:100%; max-width:420px; height:80vh; border-radius:18px 18px 0 0; overflow:hidden; background:#fff; display:flex; flex-direction:column; box-shadow:0 30px 80px rgba(0,0,0,0.2) }
+    .chat-top{ padding:12px; background:var(--color-primary); color:white; display:flex; justify-content:space-between; align-items:center }
+    #chat-messages{ padding:16px; overflow:auto; flex:1; background:#f8fafc }
+    .bubble{ display:inline-block; padding:10px 12px; border-radius:12px; max-width:78% }
+    .ai{ background:#EAF9F8; color:var(--color-primary) }
+    .me{ background:var(--color-secondary); color:white; float:right }
+    .chat-input{ display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:white }
+
+    /* bottom nav */
+    nav.bottom-nav{ position:fixed; left:0; right:0; bottom:0; height:72px; background:rgba(255,255,255,0.96); border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-around; z-index:30 }
+    nav.bottom-nav a{ display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--muted); font-size:12px; text-decoration:none }
+    nav.bottom-nav a.active{ color:var(--color-secondary) }
+
+    /* small screens safe area */
+    .pb-safe{ padding-bottom:90px }
+
+    /* modal & toast */
+    .modal-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:120 }
+    .modal-card{ background:white; border-radius:12px; padding:16px; box-shadow:0 30px 80px rgba(2,6,23,0.12); width:94%; max-width:520px; border:1px solid var(--glass-border) }
+    .toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:96px; padding:10px 14px; border-radius:12px; color:white; z-index:140; box-shadow:0 12px 30px rgba(2,6,23,0.16); background:linear-gradient(90deg,var(--color-secondary), #009aa8) }
+
+    /* small utility */
+    .muted{ color:var(--muted) }
+    .hidden{ display:none!important }
+    input, textarea, select{ font:inherit }
+    .file-preview img{ max-width:220px; border-radius:10px; box-shadow:0 8px 20px rgba(3,10,20,0.06); border:1px solid rgba(0,0,0,0.06) }
+  </style>
 </head>
 <body>
-  <!-- Top bar -->
+
+  <!-- HEADER -->
   <header class="top-bar">
-    <div class="logo-section">
-      <img src="logu.png" alt="Redhop Logo" class="logo" />
-      <div class="brand">
-        <h1>REDHOP</h1>
-        <p>powered by SELBYME</p>
+    <div class="logo" onclick="route('home')">
+      <div class="badge" aria-hidden>
+        <!-- small svg logo -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="12" r="10" fill="white" opacity="0.14"/>
+          <path d="M12 7v5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9 13l3 3 3-3" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <span class="title">REDHOP</span>
+        <small class="tag">powered by SELBYME</small>
       </div>
     </div>
-    <div class="trust-section">
-      <p>Trusted by<br><span>5M+ Users</span></p>
-      <div class="location">Sonitpur</div>
+
+    <div class="header-actions">
+      <div class="muted" style="text-align:right; display:none; min-width:72px">
+        <div style="font-size:11px">Trusted by</div>
+        <div style="font-weight:700; color:var(--color-secondary)">5M+ Users</div>
+      </div>
+      <button class="btn-loc" onclick="showToast('Location set to Sontpur (simulated)')" style="padding:8px 10px; border-radius:999px; border:1px solid var(--glass-border); background:white; display:flex; gap:8px; align-items:center; cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" stroke="#00C0B3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-weight:600">Sontpur</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
   </header>
 
-  <!-- Search -->
-  <div class="search-box">
-    <input type="text" placeholder="Search for medicines" />
-  </div>
+  <!-- MAIN -->
+  <main id="app-content" class="pb-safe">
+    <!-- JS will render pages -->
+  </main>
 
-  <!-- Quick actions -->
-  <div class="quick-actions">
-    <div class="action"><img src="medicines.png" alt=""><p>Medicines</p></div>
-    <div class="action"><img src="blood.png" alt=""><p>Free Blood</p></div>
-    <div class="action"><img src="emergency.png" alt=""><p>Emergency</p></div>
-    <div class="action"><img src="scan.png" alt=""><p>Scan Rx</p></div>
-  </div>
+  <!-- CHAT TRIGGER -->
+  <button id="chatbot-trigger" aria-label="Open chat" title="Chat with assistant" onclick="toggleChatbot()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
 
-  <!-- Promo banners -->
-  <div class="promo">
-    <div class="promo-box red">
-      <p>Lowest price<br>starting from<br><span>Rs. 2/-</span></p>
-    </div>
-    <div class="promo-box white">
-      <p><span class="icon">🩸</span> Free blood<br><small>5M+ donors</small></p>
-    </div>
-  </div>
+  <!-- CHAT MODAL (hidden) -->
+  <div id="chatbot-modal" class="hidden" role="dialog" aria-modal="true">
+    <div class="modal-wrap" onclick="if(event.target===this) toggleChatbot()">
+      <div class="panel" style="width:100%; max-width:420px; height:80vh;">
+        <div class="chat-top">
+          <div style="display:flex; align-items:center; gap:10px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10 21l-2-2H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v7" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <strong>Health Assistant</strong>
+          </div>
+          <button onclick="toggleChatbot()" aria-label="Close" style="background:none;border:0;color:white;cursor:pointer;font-size:18px">×</button>
+        </div>
 
-  <!-- Main menu -->
-  <div class="menu">
-    <div class="menu-item">
-      <span class="icon">💊</span>
-      <div>
-        <h3>Order Medicines</h3>
-        <p>Get medicines at best price</p>
-      </div>
-    </div>
-    <div class="menu-item">
-      <span class="icon">🩸</span>
-      <div>
-        <h3>Request Free Blood</h3>
-        <p>Find free blood donors</p>
-      </div>
-    </div>
-    <div class="menu-item">
-      <span class="icon">❤️</span>
-      <div>
-        <h3>Donate Blood</h3>
-        <p>Help those in need</p>
+        <div id="chat-messages" style="padding:16px; overflow:auto; flex:1; background:#f8fafc">
+          <div class="bubble ai">Hello! I'm REDHOP's Health Assistant. I can help with medicines, symptoms, and donor info. This chat is for guidance only.</div>
+        </div>
+
+        <div class="chat-input">
+          <input id="chat-input" type="text" placeholder="Ask a health question" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e6edf3" onkeydown="if(event.key==='Enter') handleChatSubmit()">
+          <button onclick="handleChatSubmit()" style="padding:10px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0;cursor:pointer">Send</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Offers -->
-  <section class="offers">
-    <h2>Offers</h2>
-    <div class="offer-card">
-      <div class="offer-icon">30% OFF</div>
-      <p>Upto 30% off on all Diabetic Medicines</p>
-    </div>
-  </section>
-
-  <!-- Bottom nav -->
-  <nav class="bottom-nav">
-    <div class="nav-item active">Home</div>
-    <div class="nav-item">Nearby</div>
-    <div class="nav-item">History</div>
-    <div class="nav-item">Account</div>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" aria-hidden="false">
+    <a href="#" onclick="route('home'); return false;" id="nav-home" class="active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#" onclick="route('nearby'); return false;" id="nav-nearby">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span>Nearby</span>
+    </a>
+    <a href="#" onclick="route('history'); return false;" id="nav-history">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 101.64-5.19L3 7" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span>History</span>
+    </a>
+    <a href="#" onclick="route('account'); return false;" id="nav-account">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.4"/><path d="M21 21a8 8 0 10-18 0" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span>Account</span>
+    </a>
   </nav>
+
+  <!-- containers -->
+  <div id="modal-container"></div>
+  <div id="toast-container"></div>
+
+  <script>
+    /* ---------- Small helpers ---------- */
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from((root||document).querySelectorAll(sel));
+    const escapeHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    /* ---------- Toast ---------- */
+    function showToast(msg, ms=2200){
+      const root = document.getElementById('toast-container');
+      if(!root) return;
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      root.appendChild(t);
+      requestAnimationFrame(()=> t.style.opacity = 1);
+      setTimeout(()=> {
+        t.style.transition = 'opacity .2s';
+        t.style.opacity = 0;
+        t.addEventListener('transitionend', ()=> t.remove());
+      }, ms);
+    }
+
+    /* ---------- Modal ---------- */
+    function showModal(title='', content='', primary='OK', onPrimary=null, secondary=null, onSecondary=null){
+      closeModal();
+      const wrap = document.createElement('div');
+      wrap.className = 'modal-wrap';
+      wrap.onclick = e => { if(e.target===wrap) closeModal(); };
+
+      const card = document.createElement('div');
+      card.className = 'modal-card';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <strong style="font-size:17px">${escapeHtml(title)}</strong>
+          <button aria-label="close" style="border:0;background:none;cursor:pointer;font-size:20px">×</button>
+        </div>
+        <div style="margin-top:10px;color:var(--color-primary)">${typeof content==='string' ? '<div>'+escapeHtml(content)+'</div>' : content}</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+          ${secondary ? '<button id="modal-secondary" style="padding:8px 12px;border-radius:8px;border:1px solid #eee;background:#f6f6f6;cursor:pointer">'+escapeHtml(secondary)+'</button>' : ''}
+          <button id="modal-primary" style="padding:8px 12px;border-radius:8px;background:var(--color-secondary);color:#fff;border:0;cursor:pointer">${escapeHtml(primary)}</button>
+        </div>
+      `;
+      card.querySelector('button[aria-label="close"]').onclick = closeModal;
+      wrap.appendChild(card);
+      document.getElementById('modal-container').appendChild(wrap);
+
+      if(secondary) card.querySelector('#modal-secondary').onclick = () => { if(onSecondary) onSecondary(); closeModal(); };
+      card.querySelector('#modal-primary').onclick = () => { if(onPrimary) onPrimary(); closeModal(); };
+    }
+    function closeModal(){ const el = document.querySelector('.modal-wrap'); if(el) el.remove(); }
+
+    /* ---------- Chat ---------- */
+    function toggleChatbot(){
+      const modal = document.getElementById('chatbot-modal');
+      modal.classList.toggle('hidden');
+      if(!modal.classList.contains('hidden')){
+        setTimeout(()=> $('#chat-input', modal).focus(), 80);
+      }
+    }
+    async function handleChatSubmit(){
+      const input = $('#chat-input', document);
+      if(!input) return;
+      const q = input.value.trim();
+      if(!q) return;
+      const messages = $('#chat-messages', document);
+      // user bubble
+      const me = document.createElement('div');
+      me.className = 'bubble me';
+      me.style.display = 'block';
+      me.style.marginLeft = 'auto';
+      me.textContent = q;
+      messages.appendChild(me);
+      input.value = '';
+      messages.scrollTop = messages.scrollHeight;
+
+      // loading
+      const loader = document.createElement('div');
+      loader.className = 'bubble ai';
+      loader.textContent = 'Thinking...';
+      messages.appendChild(loader);
+      messages.scrollTop = messages.scrollHeight;
+
+      // simulated response
+      await new Promise(r => setTimeout(r, 700));
+      loader.remove();
+      const resp = document.createElement('div');
+      resp.className = 'bubble ai';
+      resp.style.display = 'inline-block';
+      resp.textContent = "Thanks — this demo assistant is offline. For medical concerns, consult a healthcare professional.";
+      messages.appendChild(resp);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    /* ---------- Suggestions (debounced) ---------- */
+    let suggestTimer = null;
+    function debouncedSuggestions(){
+      clearTimeout(suggestTimer);
+      suggestTimer = setTimeout(showSuggestions, 220);
+    }
+    function showSuggestions(){
+      const suggestions = document.getElementById('suggestions');
+      const input = document.getElementById('search-box');
+      if(!suggestions || !input) return;
+      const q = input.value.trim();
+      if(q.length < 2){ suggestions.classList.add('hidden'); return; }
+      const list = [
+        `${q} — Paracetamol 500mg`,
+        `${q} — Diabetic Care Kit`,
+        `${q} — O- Blood Donors`
+      ];
+      suggestions.innerHTML = list.map(item => `<div class="item" role="option" tabindex="0" onclick="selectSuggestion('${escapeHtml(item)}')">${escapeHtml(item)}</div>`).join('');
+      suggestions.classList.remove('hidden');
+    }
+    function selectSuggestion(text){
+      const input = document.getElementById('search-box');
+      if(input) input.value = text;
+      document.getElementById('suggestions')?.classList.add('hidden');
+      searchProducts();
+    }
+    function searchProducts(){
+      const q = document.getElementById('search-box')?.value.trim() || '';
+      if(!q) return showToast('Enter search term');
+      showModal('Search', `Searching for "${escapeHtml(q)}" — this is a simulated demo.`, 'OK');
+    }
+
+    /* ---------- Prescription preview ---------- */
+    function handlePrescriptionUpload(ev){
+      const file = ev.target.files?.[0];
+      const preview = document.getElementById('prescription-preview');
+      if(!preview) return;
+      if(!file){ preview.innerHTML = ''; return; }
+      if(!file.type.startsWith('image/')) return showToast('Please upload an image');
+      const reader = new FileReader();
+      preview.innerHTML = `<div style="color:var(--muted)">Loading preview…</div>`;
+      reader.onload = e => {
+        preview.innerHTML = `<div class="file-preview"><img src="${e.target.result}" alt="prescription" /></div>`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* ---------- Blood request ---------- */
+    function handleBloodRequest(formEl){
+      const fm = new FormData(formEl);
+      const patient = String(fm.get('patient')||'').trim();
+      const bg = String(fm.get('blood_group')||'').trim();
+      const addr = String(fm.get('address')||'').trim();
+      if(!patient || !bg || !addr) return showToast('Please fill all required fields');
+      showModal('Request Submitted', 'Your urgent blood request has been submitted. Matching donors will be notified.', 'Done');
+      formEl.reset();
+    }
+
+    /* ---------- Slider (dots + swipe + autoplay) ---------- */
+    let sliderState = { timer:null, idx:0 };
+    function initSlider(){
+      const track = document.getElementById('slider-track');
+      const dotsWrap = document.getElementById('slider-dots');
+      if(!track || !dotsWrap) return;
+      const items = Array.from(track.children);
+      if(!items.length) return;
+      const gap = 12;
+      sliderState.idx = 0;
+      function setPos(i){
+        const itemWidth = items[0].getBoundingClientRect().width + gap;
+        track.style.transform = `translateX(${-i * itemWidth}px)`;
+        Array.from(dotsWrap.children).forEach((b,bi) => b.classList.toggle('active', bi === i));
+      }
+      // dots
+      dotsWrap.innerHTML = '';
+      items.forEach((_,i) => {
+        const btn = document.createElement('button');
+        btn.type='button';
+        if(i===0) btn.classList.add('active');
+        btn.title = `Slide ${i+1}`;
+        btn.addEventListener('click', ()=> { sliderState.idx = i; setPos(i); resetAuto(); });
+        dotsWrap.appendChild(btn);
+      });
+
+      // touch/mouse drag
+      let startX=0, isDragging=false, curTranslate=0;
+      function onStart(e){
+        isDragging = true;
+        startX = (e.touches?e.touches[0].clientX:e.clientX);
+        curTranslate = -sliderState.idx * (items[0].getBoundingClientRect().width + gap);
+        track.style.transition = 'none';
+        stopAuto();
+      }
+      function onMove(e){
+        if(!isDragging) return;
+        const x = (e.touches?e.touches[0].clientX:e.clientX);
+        const dx = x - startX;
+        track.style.transform = `translateX(${curTranslate + dx}px)`;
+      }
+      function onEnd(e){
+        if(!isDragging) return;
+        isDragging = false;
+        track.style.transition = '';
+        const x = (e.changedTouches?e.changedTouches[0].clientX:e.clientX);
+        const dx = x - startX;
+        const threshold = Math.min(80, items[0].getBoundingClientRect().width * 0.18);
+        if(dx > threshold) sliderState.idx = Math.max(0, sliderState.idx -1);
+        else if(dx < -threshold) sliderState.idx = Math.min(items.length -1, sliderState.idx +1);
+        setPos(sliderState.idx);
+        startAuto();
+      }
+      track.addEventListener('touchstart', onStart, {passive:true});
+      track.addEventListener('touchmove', onMove, {passive:true});
+      track.addEventListener('touchend', onEnd);
+      track.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      function next(){ sliderState.idx = (sliderState.idx + 1) % items.length; setPos(sliderState.idx); }
+      function startAuto(){ sliderState.timer = setInterval(next, 4500); }
+      function stopAuto(){ if(sliderState.timer){ clearInterval(sliderState.timer); sliderState.timer = null; } }
+      function resetAuto(){ stopAuto(); startAuto(); }
+      track.parentElement.addEventListener('mouseenter', stopAuto);
+      track.parentElement.addEventListener('mouseleave', startAuto);
+
+      setPos(0);
+      startAuto();
+    }
+
+    /* ---------- router & pages ---------- */
+    function route(page){
+      const content = document.getElementById('app-content');
+      if(!content) return;
+      setActiveNav(page||'home');
+      switch(page){
+        case 'medicines': content.innerHTML = renderMedicinesPage(); break;
+        case 'request_blood': content.innerHTML = renderRequestBloodPage(); break;
+        case 'account': content.innerHTML = renderAccountPage(); break;
+        case 'nearby':
+        case 'history': content.innerHTML = renderPlaceholder(page); break;
+        default: content.innerHTML = renderHomePage();
+      }
+      // attach post render behaviours
+      // icons are inline SVGs, nothing external needed
+      // init slider on home
+      if(page==='home' || typeof page === 'undefined') setTimeout(initSlider, 60);
+
+      // attach file input change globally
+      const pres = document.getElementById('prescription-upload');
+      if(pres) pres.onchange = handlePrescriptionUpload;
+
+      const blood = document.getElementById('blood-form');
+      if(blood) blood.onsubmit = e => { e.preventDefault(); handleBloodRequest(blood); };
+    }
+    window.route = route;
+
+    function setActiveNav(page){
+      ['home','nearby','history','account'].forEach(p => {
+        const el = document.getElementById('nav-'+p);
+        if(!el) return;
+        el.classList.toggle('active', page === 'home' ? p==='home' : p===page);
+      });
+    }
+
+    /* ---------- templates ---------- */
+    function renderHomePage(){
+      return `
+        <div class="page">
+          <div class="search-wrapper">
+            <div class="search-box">
+              <input id="search-box" placeholder="Search medicines or donors..." oninput="debouncedSuggestions()" aria-label="Search" />
+              <button class="btn" title="Search" onclick="searchProducts()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div id="suggestions" class="suggestions hidden" aria-hidden="true"></div>
+          </div>
+
+          <div class="slider-container">
+            <div id="slider-track" class="slider-track" style="will-change:transform">
+              <div class="slide si-accent">
+                <div>
+                  <div style="font-size:13px;font-weight:600">Up to 30% OFF</div>
+                  <div style="font-size:22px;font-weight:800;margin:6px 0">Diabetic Care</div>
+                  <div style="font-size:12px;opacity:.9">Lowest prices</div>
+                </div>
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M21 7l-8 8M21 7h-8v8" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+
+              <div class="slide si-danger">
+                <div>
+                  <div style="font-size:13px;font-weight:600">Life Saving Network</div>
+                  <div style="font-size:22px;font-weight:800;margin:6px 0">5M+ Donors</div>
+                  <div style="font-size:12px;opacity:.9">Request free blood</div>
+                </div>
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M12 2C12 2 7 6 7 10a5 5 0 0010 0c0-4-5-8-5-8z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+
+              <div class="slide si-primary">
+                <div>
+                  <div style="font-size:13px;font-weight:600">Special Offer</div>
+                  <div style="font-size:22px;font-weight:800;margin:6px 0">Full Body Checkup</div>
+                  <div style="font-size:12px;opacity:.9">Book lab tests</div>
+                </div>
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M19 11c0 4-7 9-7 9s-7-5-7-9a7 7 0 0114 0z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+
+            <div id="slider-dots" class="slider-dots" style="padding:8px 0; display:flex; justify-content:center"></div>
+          </div>
+
+          <section style="margin-top:18px">
+            <h2 class="section-title">Core Services</h2>
+            <div class="grid cols-3">
+              <div class="card" onclick="route('medicines')">
+                <div class="icon teal" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 12h12" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight:700">Order Medicines</div>
+                  <div class="muted" style="font-size:13px">Fast delivery</div>
+                </div>
+              </div>
+
+              <div class="card" onclick="route('request_blood')">
+                <div class="icon red" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2s4 4 4 7a4 4 0 11-8 0c0-3 4-7 4-7z" stroke="white" stroke-width="1.6"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight:700">Request Blood</div>
+                  <div class="muted" style="font-size:13px">5M+ donors</div>
+                </div>
+              </div>
+
+              <div class="card" onclick="showModal('Emergency','Call your local emergency number immediately if life is at risk','OK')">
+                <div class="icon dark" aria-hidden>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4-9 4-9-4 9-4z" stroke="white" stroke-width="1.6"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight:700">Emergency Help</div>
+                  <div style="font-size:13px;color:var(--color-danger);font-weight:700">Immediate assistance</div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function renderMedicinesPage(){
+      return `
+        <div class="page">
+          <h2 class="section-title">Order Medicines</h2>
+
+          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed #e6eef4;margin-bottom:12px">
+            <div style="font-weight:700">Upload Prescription</div>
+            <div style="margin-top:10px">
+              <input id="prescription-upload" type="file" accept="image/*" />
+              <div id="prescription-preview" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
+            <div style="display:flex;gap:8px">
+              <input id="med-search" placeholder="Enter medicine or brand name..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #e7eef4" />
+              <button onclick="showToast('Search simulated')" style="padding:10px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0;cursor:pointer">Search</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRequestBloodPage(){
+      return `
+        <div class="page">
+          <h2 class="section-title">Blood Request</h2>
+          <form id="blood-form" style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
+            <div style="display:grid;gap:10px;grid-template-columns:repeat(1,1fr)">
+              <input name="patient" placeholder="Patient Name" required style="padding:10px;border-radius:10px;border:1px solid #e7eef4" />
+              <select name="blood_group" required style="padding:10px;border-radius:10px;border:1px solid #e7eef4">
+                <option value="">Select Blood Group *</option>
+                <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
+                <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
+              </select>
+            </div>
+            <textarea name="address" rows="3" placeholder="Hospital address & contact details (urgent)" required style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e7eef4"></textarea>
+            <button type="submit" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;background:var(--color-danger);color:white;border:0">Find Donors</button>
+          </form>
+        </div>
+      `;
+    }
+
+    function renderAccountPage(){
+      return `
+        <div class="page">
+          <h2 class="section-title">My Account</h2>
+          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:64px;height:64px;border-radius:999px;background:#e6eef4;display:flex;align-items:center;justify-content:center">JS</div>
+              <div>
+                <div style="font-weight:700">John Smith</div>
+                <div class="muted">john.smith@example.com</div>
+                <div style="color:var(--color-secondary);font-size:13px;margin-top:6px">+91 98765 43210</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPlaceholder(page){
+      const title = page.charAt(0).toUpperCase()+page.slice(1);
+      return `
+        <div class="page" style="min-height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center">
+          <div style="width:56px;height:56px;border-radius:12px;background:#f3f6f8;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 8v4" stroke="#9aa0a6" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <h3 style="font-size:20px;margin:6px 0">${escapeHtml(title)} coming soon</h3>
+          <p class="muted">Working on advanced ${escapeHtml(title)} features. Check back soon.</p>
+          <button onclick="route('home')" style="margin-top:12px;padding:8px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0">Back to Home</button>
+        </div>
+      `;
+    }
+
+    /* ---------- global events ---------- */
+    // click outside suggestions closes it
+    document.addEventListener('click', (e) => {
+      const suggestions = document.getElementById('suggestions');
+      const wrapper = document.querySelector('.search-wrapper');
+      if(suggestions && wrapper && !wrapper.contains(e.target)) suggestions.classList.add('hidden');
+    });
+    // keyboard shortucts
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){ closeModal(); const chat = document.getElementById('chatbot-modal'); if(chat && !chat.classList.contains('hidden')) toggleChatbot(); }
+      if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){ e.preventDefault(); document.getElementById('search-box')?.focus(); document.getElementById('search-box')?.select(); }
+    });
+
+    // expose functions used inline
+    window.debouncedSuggestions = debouncedSuggestions;
+    window.selectSuggestion = selectSuggestion;
+    window.searchProducts = searchProducts;
+    window.toggleChatbot = toggleChatbot;
+    window.handleChatSubmit = handleChatSubmit;
+    window.showModal = showModal;
+    window.showToast = showToast;
+    window.route = route;
+
+    // init
+    document.addEventListener('DOMContentLoaded', () => {
+      route('home');
+    });
+  </script>
+
 </body>
 </html>
