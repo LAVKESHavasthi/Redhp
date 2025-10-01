@@ -3,201 +3,182 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>REDHOP — Health & Blood Network (Pure JS/CSS)</title>
+  <title>REDHOP — Medicine & Blood Delivery</title>
 
   <style>
-    /* ---------- Theme vars ---------- */
+    /* --------------------
+       Theme & globals
+       -------------------- */
     :root{
-      --color-primary: #071430;
-      --color-secondary: #00C0B3;
-      --color-danger: #E63B3B;
-      --color-surface: #F7FAFC;
-      --glass: rgba(255,255,255,0.72);
-      --muted: #6b7280;
-      --card-shadow: 0 12px 30px rgba(2,6,23,0.06);
-      --glass-border: rgba(9,20,40,0.04);
-      --radius: 12px;
+      --color-primary:#071430;
+      --color-secondary:#00C0B3;
+      --color-danger:#E63B3B;
+      --surface:#F7FAFC;
+      --muted:#6b7280;
+      --glass-border:rgba(9,20,40,0.04);
+      --card-shadow:0 12px 30px rgba(2,6,23,0.06);
+      --radius:12px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--color-surface);
-      color:var(--color-primary);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-font-smoothing:antialiased;
+      margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:var(--surface);color:var(--color-primary);-webkit-font-smoothing:antialiased;
     }
     a{color:inherit;text-decoration:none}
     button{font:inherit}
 
-    /* ---------- layout ---------- */
+    /* --------------------
+       Header
+       -------------------- */
     header.top-bar{
-      position:sticky; top:0; z-index:60;
-      background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
+      position:sticky;top:0;z-index:60;
+      background:linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.90));
       backdrop-filter: blur(6px);
-      border-bottom: 1px solid var(--glass-border);
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--glass-border);
+      padding:12px 16px;
+      display:flex;align-items:center;justify-content:space-between;
     }
-    .logo { display:flex; align-items:center; gap:12px; cursor:pointer }
-    .logo .badge{
-      width:44px; height:44px; border-radius:12px;
-      background: linear-gradient(45deg,#ef4444,#dc2626);
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 6px 18px rgba(0,0,0,0.08);
-    }
-    .logo .txt { line-height:1 }
-    .logo .txt .title{ display:block; font-weight:800; font-size:18px; letter-spacing:-0.4px; color:var(--color-primary) }
-    .logo .txt .tag{ display:block; font-size:11px; color:#9aa0a6; margin-top:2px }
+    .logo{display:flex;gap:12px;align-items:center;cursor:pointer}
+    .logo .badge{width:44px;height:44px;border-radius:10px;background:linear-gradient(45deg,#ef4444,#dc2626);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .logo .txt .title{font-weight:800;font-size:18px}
+    .logo .txt .tag{font-size:11px;color:#9aa0a6}
 
-    .header-actions { display:flex; align-items:center; gap:12px }
-
-    /* ---------- content ---------- */
-    main#app-content{ padding-bottom:120px; min-height:calc(100vh - 76px) }
-
-    .page { padding:16px; max-width:900px; margin:0 auto }
-    .search-box { display:flex; gap:8px; align-items:center; background:white; padding:12px; border-radius:14px; box-shadow:var(--card-shadow); border:1px solid var(--glass-border) }
-    .search-box input{
-      border:0; outline:none; font-size:15px; flex:1; padding:6px 6px;
-      background:transparent;
-    }
-    .search-box .btn {
-      width:44px; height:44px; border-radius:10px; background:var(--color-primary); color:white;
-      display:flex; align-items:center; justify-content:center; border:0; cursor:pointer;
-      box-shadow:0 8px 20px rgba(2,6,23,0.06);
+    .header-actions{display:flex;gap:12px;align-items:center}
+    .cart-bubble{position:relative}
+    .cart-count{
+      position:absolute;top:-8px;right:-10px;background:var(--color-danger);color:#fff;padding:2px 6px;border-radius:999px;font-size:12px;
     }
 
-    /* suggestions */
-    .search-wrapper { position:relative; width:100% }
-    .suggestions {
-      position:absolute; left:0; right:0; top:calc(100% + 10px); z-index:50;
-      background:#fff; border-radius:12px; box-shadow:0 16px 40px rgba(2,6,23,0.06);
-      border:1px solid var(--glass-border); overflow:hidden;
-    }
-    .suggestions .item{ padding:10px 12px; cursor:pointer; font-size:14px; color:var(--color-primary) }
-    .suggestions .item:hover{ background:#f3f6f8 }
+    /* --------------------
+       Main content
+       -------------------- */
+    main#app-content{padding-bottom:110px;min-height:calc(100vh - 72px)}
+    .page{padding:16px;max-width:980px;margin:0 auto}
+    .muted{color:var(--muted)}
+    .hidden{display:none!important}
 
-    /* slider */
-    .slider-container{ margin-top:12px; border-radius:14px; overflow:hidden; position:relative }
-    .slider-track { display:flex; gap:12px; transition:transform .65s cubic-bezier(.2,.9,.25,1); padding:8px }
-    .slide { flex:0 0 86%; min-width:220px; max-width:520px; border-radius:12px; padding:16px; color:#fff; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--card-shadow) }
-    @media(min-width:760px){ .slide { flex:0 0 32% } }
-    .si-accent { background: linear-gradient(135deg,var(--color-secondary), #00A9E6); }
-    .si-danger { background: linear-gradient(135deg,var(--color-danger), #c13a3a); }
-    .si-primary{ background: linear-gradient(135deg,#0b2540,#083155); }
-    .slider-dots { display:flex; gap:8px; justify-content:center; margin-top:10px }
-    .slider-dots button{ width:8px; height:8px; border-radius:20px; background:rgba(255,255,255,0.5); border:0; cursor:pointer; opacity:.9 }
-    .slider-dots button.active{ transform:scale(1.25); background:#fff; box-shadow:0 8px 20px rgba(0,0,0,0.12) }
+    /* --------------------
+       Search
+       -------------------- */
+    .search-wrapper{position:relative}
+    .search-box{display:flex;gap:8px;align-items:center;background:#fff;padding:10px;border-radius:14px;box-shadow:var(--card-shadow);border:1px solid var(--glass-border)}
+    .search-box input{border:0;outline:none;padding:8px 6px;font-size:15px;background:transparent;flex:1}
+    .search-box button{width:44px;height:44px;border-radius:10px;border:0;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center}
+    .suggestions{position:absolute;left:0;right:0;top:calc(100% + 10px);background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(2,6,23,0.06);border:1px solid var(--glass-border);overflow:hidden;z-index:60}
+    .suggestions .item{padding:10px 12px;cursor:pointer;font-size:14px}
+    .suggestions .item:hover{background:#f3f6f8}
 
-    /* sections */
-    h2.section-title { margin:18px 0 8px; font-size:20px }
-    .grid { display:grid; gap:12px }
-    .grid.cols-3 { grid-template-columns: repeat(1,1fr) }
-    @media(min-width:760px){ .grid.cols-3 { grid-template-columns: repeat(3,1fr) } }
-    .card { background:#fff; padding:16px; border-radius:14px; box-shadow:var(--card-shadow); display:flex; gap:12px; align-items:center; cursor:pointer; transition:transform .14s ease, box-shadow .14s ease; border:1px solid transparent }
-    .card:hover{ transform:translateY(-4px); box-shadow:0 18px 40px rgba(2,6,23,0.08) }
-    .card .icon { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:18px }
-    .icon.teal{ background:linear-gradient(135deg,#2dd4bf,#38bdf8) }
-    .icon.red{ background:linear-gradient(135deg,#ef4444,#fb7185) }
-    .icon.dark{ background:#ef4444 }
+    /* --------------------
+       Slider
+       -------------------- */
+    .slider-container{margin-top:14px;border-radius:14px;overflow:hidden}
+    .slider-track{display:flex;gap:12px;transition:transform .5s cubic-bezier(.2,.9,.25,1);padding:8px}
+    .slide{flex:0 0 86%;min-width:220px;max-width:520px;border-radius:12px;padding:16px;color:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--card-shadow)}
+    @media(min-width:760px){ .slide{flex:0 0 32%} }
+    .si-accent{background:linear-gradient(135deg,var(--color-secondary),#00A9E6)}
+    .si-danger{background:linear-gradient(135deg,var(--color-danger),#c13a3a)}
+    .si-primary{background:linear-gradient(135deg,#0b2540,#083155)}
+    .slider-dots{display:flex;gap:8px;justify-content:center;margin-top:10px}
+    .slider-dots button{width:8px;height:8px;border-radius:20px;background:rgba(0,0,0,0.18);border:0;cursor:pointer}
+    .slider-dots button.active{transform:scale(1.25);background:#111}
 
-    /* chat trigger */
-    #chatbot-trigger{ position:fixed; right:16px; bottom:120px; width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; background:var(--color-secondary); color:white; border:0; box-shadow:0 18px 40px rgba(0,0,0,0.16); cursor:pointer; z-index:40 }
+    /* --------------------
+       Grid & cards
+       -------------------- */
+    .grid{display:grid;gap:12px}
+    .grid.cols-3{grid-template-columns:repeat(1,1fr)}
+    @media(min-width:560px){ .grid.cols-3{grid-template-columns:repeat(2,1fr)} }
+    @media(min-width:960px){ .grid.cols-3{grid-template-columns:repeat(3,1fr)} }
+    .card{background:#fff;padding:14px;border-radius:12px;box-shadow:var(--card-shadow);display:flex;gap:12px;align-items:center}
+    .card:hover{transform:translateY(-4px);transition:0.18s}
+    .icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px}
+    .icon.teal{background:linear-gradient(135deg,#2dd4bf,#38bdf8)}
+    .icon.red{background:linear-gradient(135deg,#ef4444,#fb7185)}
+    .icon.dark{background:#ef4444}
 
-    /* chat modal */
-    #chatbot-modal{ position:fixed; inset:0; display:flex; align-items:flex-end; justify-content:center; z-index:50; background:rgba(0,0,0,0.42) }
-    #chatbot-modal .panel{ width:100%; max-width:420px; height:80vh; border-radius:18px 18px 0 0; overflow:hidden; background:#fff; display:flex; flex-direction:column; box-shadow:0 30px 80px rgba(0,0,0,0.2) }
-    .chat-top{ padding:12px; background:var(--color-primary); color:white; display:flex; justify-content:space-between; align-items:center }
-    #chat-messages{ padding:16px; overflow:auto; flex:1; background:#f8fafc }
-    .bubble{ display:inline-block; padding:10px 12px; border-radius:12px; max-width:78% }
-    .ai{ background:#EAF9F8; color:var(--color-primary) }
-    .me{ background:var(--color-secondary); color:white; float:right }
-    .chat-input{ display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:white }
+    /* --------------------
+       Chat
+       -------------------- */
+    #chatbot-trigger{position:fixed;right:16px;bottom:120px;width:56px;height:56px;border-radius:14px;background:var(--color-secondary);color:white;border:0;box-shadow:0 18px 40px rgba(0,0,0,0.16);display:flex;align-items:center;justify-content:center;z-index:80;cursor:pointer}
+    #chatbot-modal{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.42);z-index:90}
+    #chatbot-modal .panel{width:100%;max-width:420px;height:80vh;border-radius:18px 18px 0 0;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+    .chat-top{padding:12px;background:var(--color-primary);color:white;display:flex;justify-content:space-between;align-items:center}
+    #chat-messages{padding:16px;overflow:auto;flex:1;background:#f8fafc}
+    .bubble{display:inline-block;padding:10px 12px;border-radius:12px;max-width:78%;margin:6px 0}
+    .ai{background:#EAF9F8;color:var(--color-primary)}
+    .me{background:var(--color-secondary);color:white;float:right}
+    .chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid #eee;background:white}
 
-    /* bottom nav */
-    nav.bottom-nav{ position:fixed; left:0; right:0; bottom:0; height:72px; background:rgba(255,255,255,0.96); border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-around; z-index:30 }
-    nav.bottom-nav a{ display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--muted); font-size:12px; text-decoration:none }
-    nav.bottom-nav a.active{ color:var(--color-secondary) }
+    /* --------------------
+       Bottom nav
+       -------------------- */
+    nav.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:72px;background:rgba(255,255,255,0.98);border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-around;z-index:70}
+    nav.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+    nav.bottom-nav a.active{color:var(--color-secondary)}
 
-    /* small screens safe area */
-    .pb-safe{ padding-bottom:90px }
-
-    /* modal & toast */
-    .modal-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:120 }
-    .modal-card{ background:white; border-radius:12px; padding:16px; box-shadow:0 30px 80px rgba(2,6,23,0.12); width:94%; max-width:520px; border:1px solid var(--glass-border) }
-    .toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:96px; padding:10px 14px; border-radius:12px; color:white; z-index:140; box-shadow:0 12px 30px rgba(2,6,23,0.16); background:linear-gradient(90deg,var(--color-secondary), #009aa8) }
-
-    /* small utility */
-    .muted{ color:var(--muted) }
-    .hidden{ display:none!important }
-    input, textarea, select{ font:inherit }
-    .file-preview img{ max-width:220px; border-radius:10px; box-shadow:0 8px 20px rgba(3,10,20,0.06); border:1px solid rgba(0,0,0,0.06) }
+    /* --------------------
+       Modal, toast, utils
+       -------------------- */
+    .modal-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:120}
+    .modal-card{background:white;border-radius:12px;padding:16px;box-shadow:0 30px 80px rgba(2,6,23,0.12);width:94%;max-width:520px;border:1px solid var(--glass-border)}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;padding:10px 14px;border-radius:12px;color:white;z-index:140;background:linear-gradient(90deg,var(--color-secondary),#009aa8)}
+    input,textarea,select{font:inherit}
+    .file-preview img{max-width:220px;border-radius:10px;box-shadow:0 8px 20px rgba(3,10,20,0.06);border:1px solid rgba(0,0,0,0.06);margin-top:8px}
+    .btn-primary{padding:8px 12px;border-radius:8px;background:var(--color-secondary);color:#fff;border:0;cursor:pointer}
+    .btn-link{padding:8px 12px;border-radius:8px;border:1px solid #e6eef4;background:#fff;cursor:pointer}
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
   <header class="top-bar">
-    <div class="logo" onclick="route('home')">
-      <div class="badge" aria-hidden>
-        <!-- small svg logo -->
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <circle cx="12" cy="12" r="10" fill="white" opacity="0.14"/>
-          <path d="M12 7v5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M9 13l3 3 3-3" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </div>
+    <div class="logo" onclick="navigateHash('home')">
+      <div class="badge" aria-hidden>RH</div>
       <div class="txt">
-        <span class="title">REDHOP</span>
-        <small class="tag">powered by SELBYME</small>
+        <div class="title">REDHOP</div>
+        <small class="tag">Medicine & Blood Network</small>
       </div>
     </div>
 
     <div class="header-actions">
-      <div class="muted" style="text-align:right; display:none; min-width:72px">
-        <div style="font-size:11px">Trusted by</div>
-        <div style="font-weight:700; color:var(--color-secondary)">5M+ Users</div>
+      <button onclick="navigateHash('request_blood')" title="Request Blood" style="border:0;background:none;cursor:pointer">🩸</button>
+
+      <div class="cart-bubble" title="Cart">
+        <button onclick="navigateHash('cart')" style="border:0;background:none;cursor:pointer;font-size:18px">🛒</button>
+        <span id="cart-count" class="cart-count">0</span>
       </div>
-      <button class="btn-loc" onclick="showToast('Location set to Sontpur (simulated)')" style="padding:8px 10px; border-radius:999px; border:1px solid var(--glass-border); background:white; display:flex; gap:8px; align-items:center; cursor:pointer;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" stroke="#00C0B3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span style="font-weight:600">Sontpur</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+
+      
+       <a href="#account" onclick="navigateHash('account'); return false;" id="nav-account">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.4"/><path d="M21 21a8 8 0 10-18 0" stroke="currentColor" stroke-width="1.4"/></svg>
+      
+    </a>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main id="app-content" class="pb-safe">
-    <!-- JS will render pages -->
-  </main>
+  <!-- MAIN APP (router renders pages here) -->
+  <main id="app-content"></main>
 
   <!-- CHAT TRIGGER -->
-  <button id="chatbot-trigger" aria-label="Open chat" title="Chat with assistant" onclick="toggleChatbot()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
+  <button id="chatbot-trigger" aria-label="Open chat" title="Chat" onclick="toggleChatbot()">💬</button>
 
-  <!-- CHAT MODAL (hidden) -->
+  <!-- CHAT MODAL -->
   <div id="chatbot-modal" class="hidden" role="dialog" aria-modal="true">
     <div class="modal-wrap" onclick="if(event.target===this) toggleChatbot()">
-      <div class="panel" style="width:100%; max-width:420px; height:80vh;">
+      <div class="panel" style="width:100%;max-width:420px;height:80vh;">
         <div class="chat-top">
-          <div style="display:flex; align-items:center; gap:10px">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10 21l-2-2H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v7" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <strong>Health Assistant</strong>
-          </div>
-          <button onclick="toggleChatbot()" aria-label="Close" style="background:none;border:0;color:white;cursor:pointer;font-size:18px">×</button>
+          <div style="display:flex;align-items:center;gap:10px"><strong>REDHOP Assistant</strong></div>
+          <button onclick="toggleChatbot()" aria-label="Close" style="background:none;border:0;color:white;cursor:pointer">×</button>
         </div>
 
-        <div id="chat-messages" style="padding:16px; overflow:auto; flex:1; background:#f8fafc">
-          <div class="bubble ai">Hello! I'm REDHOP's Health Assistant. I can help with medicines, symptoms, and donor info. This chat is for guidance only.</div>
+        <div id="chat-messages" style="padding:16px;overflow:auto;flex:1;background:#f8fafc">
+          <div class="bubble ai">Hi — I can help with medicine availability, order status, and blood donor info. Try: "Paracetamol price" or "My order status".</div>
         </div>
 
         <div class="chat-input">
-          <input id="chat-input" type="text" placeholder="Ask a health question" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e6edf3" onkeydown="if(event.key==='Enter') handleChatSubmit()">
-          <button onclick="handleChatSubmit()" style="padding:10px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0;cursor:pointer">Send</button>
+          <input id="chat-input" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') handleChatSubmit()" />
+          <button class="btn-primary" onclick="handleChatSubmit()">Send</button>
         </div>
       </div>
     </div>
@@ -205,19 +186,22 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" aria-hidden="false">
-    <a href="#" onclick="route('home'); return false;" id="nav-home" class="active">
+    <a href="#home" onclick="navigateHash('home'); return false;" id="nav-home" class="active">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Home</span>
     </a>
-    <a href="#" onclick="route('nearby'); return false;" id="nav-nearby">
+    
+    <a href="#medicines" onclick="navigateHash('medicines'); return false;" id="nav-medicines">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" stroke="currentColor" stroke-width="1.4"/></svg>
-      <span>Nearby</span>
+      <span>medicines</span>
     </a>
-    <a href="#" onclick="route('history'); return false;" id="nav-history">
+    
+    
+    <a href="#orders" onclick="navigateHash('orders'); return false;" id="nav-history">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 101.64-5.19L3 7" stroke="currentColor" stroke-width="1.4"/></svg>
-      <span>History</span>
+      <span>Orders</span>
     </a>
-    <a href="#" onclick="route('account'); return false;" id="nav-account">
+    <a href="#account" onclick="navigateHash('account'); return false;" id="nav-account">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.4"/><path d="M21 21a8 8 0 10-18 0" stroke="currentColor" stroke-width="1.4"/></svg>
       <span>Account</span>
     </a>
@@ -228,451 +212,944 @@
   <div id="toast-container"></div>
 
   <script>
-    /* ---------- Small helpers ---------- */
-    const $ = (sel, root = document) => root.querySelector(sel);
-    const $$ = (sel, root = document) => Array.from((root||document).querySelectorAll(sel));
-    const escapeHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  /* =========================
+     Full merged script
+     ========================= */
 
-    /* ---------- Toast ---------- */
-    function showToast(msg, ms=2200){
-      const root = document.getElementById('toast-container');
-      if(!root) return;
-      const t = document.createElement('div');
-      t.className = 'toast';
-      t.textContent = msg;
-      root.appendChild(t);
-      requestAnimationFrame(()=> t.style.opacity = 1);
-      setTimeout(()=> {
-        t.style.transition = 'opacity .2s';
-        t.style.opacity = 0;
-        t.addEventListener('transitionend', ()=> t.remove());
-      }, ms);
+  // -------------------------
+  // Data (sample products)
+  // Replace / extend with your actual data
+  // -------------------------
+  const PRODUCTS = [
+    { id: "1", name: "Paracetamol 500mg (Strip of 10)", price: 20, image: "https://via.placeholder.com/320x180?text=Paracetamol", brand: "Generic", stock: 120 },
+    { id: "2", name: "Amoxicillin 250mg (10 capsules)", price: 45, image: "https://via.placeholder.com/320x180?text=Amoxicillin", brand: "PharmaCo", stock: 45 },
+    { id: "3", name: "Cough Syrup 100ml", price: 85, image: "https://via.placeholder.com/320x180?text=Cough+Syrup", brand: "HealthLab", stock: 20 },
+    { id: "4", name: "Vitamin D 60caps", price: 199, image: "https://via.placeholder.com/320x180?text=Vitamin+D", brand: "NutriCare", stock: 80 },
+    { id: "5", name: "Insulin (demo)", price: 499, image: "https://via.placeholder.com/320x180?text=Insulin", brand: "MediLife", stock: 8 }
+  ];
+
+  // -------------------------
+  // Helper utilities
+  // -------------------------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const escapeHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // -------------------------
+  // Toast & Modal
+  // -------------------------
+  function showToast(msg, ms=2200){
+    const root = document.getElementById('toast-container');
+    if(!root) return;
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    root.appendChild(t);
+    setTimeout(()=> t.remove(), ms);
+  }
+
+  function showModal(title='', content='', primary='OK', onPrimary=null, secondary=null, onSecondary=null){
+    closeModal();
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap';
+    wrap.onclick = e => { if(e.target === wrap) closeModal(); };
+
+    const card = document.createElement('div');
+    card.className = 'modal-card';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <strong>${escapeHtml(title)}</strong>
+        <button aria-label="close" style="border:0;background:none;cursor:pointer;font-size:20px">×</button>
+      </div>
+      <div style="margin-top:10px">${typeof content === 'string' ? `<div>${escapeHtml(content)}</div>` : content}</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+        ${secondary ? `<button id="modal-secondary" style="padding:8px 12px;border-radius:8px;border:1px solid #eee;background:#f6f6f6;cursor:pointer">${escapeHtml(secondary)}</button>` : ''}
+        <button id="modal-primary" style="padding:8px 12px;border-radius:8px;background:var(--color-secondary);color:#fff;border:0;cursor:pointer">${escapeHtml(primary)}</button>
+      </div>
+    `;
+    card.querySelector('button[aria-label="close"]').onclick = closeModal;
+    wrap.appendChild(card);
+    document.getElementById('modal-container').appendChild(wrap);
+    if(secondary) card.querySelector('#modal-secondary').onclick = () => { if(onSecondary) onSecondary(); closeModal(); };
+    card.querySelector('#modal-primary').onclick = () => { if(onPrimary) onPrimary(); closeModal(); };
+  }
+
+  function closeModal(){ const el = document.querySelector('.modal-wrap'); if(el) el.remove(); }
+
+  // -------------------------
+  // Chat (simple rule-based demo)
+  // -------------------------
+  function toggleChatbot(){
+    const modal = document.getElementById('chatbot-modal');
+    modal.classList.toggle('hidden');
+    if(!modal.classList.contains('hidden')) $('#chat-input').focus();
+  }
+
+  async function handleChatSubmit(){
+    const input = $('#chat-input');
+    if(!input) return;
+    const q = String(input.value || '').trim();
+    if(!q) return;
+    const messages = $('#chat-messages');
+    const me = document.createElement('div');
+    me.className = 'bubble me';
+    me.textContent = q;
+    messages.appendChild(me);
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    const loading = document.createElement('div');
+    loading.className = 'bubble ai';
+    loading.textContent = 'Thinking...';
+    messages.appendChild(loading);
+    messages.scrollTop = messages.scrollHeight;
+
+    await new Promise(r=>setTimeout(r, 500));
+
+    loading.remove();
+    const reply = document.createElement('div');
+    reply.className = 'bubble ai';
+    let text = 'Sorry, I cannot answer that. For medical advice, contact a qualified professional.';
+    const ql = q.toLowerCase();
+    if(ql.includes('paracetamol')) text = 'Paracetamol 500mg — ₹20 per strip (sample data).';
+    if(ql.includes('price') && ql.includes('insulin')) text = 'Insulin price shown on product page (demo).';
+    if(ql.includes('order')) text = 'To check order status, open Orders section. This is a demo — real tracking needs server integration.';
+    if(ql.includes('donor') || ql.includes('blood')) text = 'Blood donors: use Blood Request form. We notify donors nearby (demo).';
+    reply.textContent = text;
+    messages.appendChild(reply);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // -------------------------
+  // Cart helpers
+  // -------------------------
+  function loadCart(){ try{ const c = JSON.parse(localStorage.getItem('cart')||'[]'); return Array.isArray(c)?c:[] }catch(e){ return []; } }
+  function saveCart(cart){ localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); }
+  function updateCartCount(){ const el = document.getElementById('cart-count'); if(!el) return; const total = loadCart().reduce((s,i)=>s + (i.quantity||0), 0); el.textContent = total; }
+
+  function addToCart(id, qty=1){
+    const cart = loadCart();
+    const i = cart.findIndex(x=>x.id==id);
+    if(i>-1) cart[i].quantity = (cart[i].quantity||1) + qty;
+    else cart.push({ id, quantity: qty });
+    saveCart(cart);
+    showToast('Added to cart');
+  }
+
+  function changeQty(index, delta){
+    const cart = loadCart();
+    if(!cart[index]) return;
+    cart[index].quantity = Math.max(1, (cart[index].quantity||1) + delta);
+    saveCart(cart);
+    renderCurrentRoute();
+  }
+  function removeCartItem(index){
+    const cart = loadCart();
+    if(!cart[index]) return;
+    cart.splice(index,1);
+    saveCart(cart);
+    renderCurrentRoute();
+  }
+
+  // -------------------------
+  // Router
+  // -------------------------
+  function navigateHash(page){
+    location.hash = page;
+  }
+
+  function parseHash(){
+    const raw = location.hash.replace('#','') || 'home';
+    const [page, qs] = raw.split('?');
+    return { page: page || 'home', qs: qs || '' };
+  }
+
+  function setActiveNav(page){
+    const map = { home:'nav-home', medicines:'nav-medicines', orders:'nav-orders', account:'nav-account' };
+    document.querySelectorAll('nav.bottom-nav a').forEach(a => a.classList.remove('active'));
+    const id = map[page] || map.home;
+    const el = document.getElementById(id);
+    if(el) el.classList.add('active');
+  }
+
+  // -------------------------
+  // Slider
+  // -------------------------
+  let sliderState = { timer:null, idx:0 };
+  function initSlider(){
+    const track = document.getElementById('slider-track');
+    const dots = document.getElementById('slider-dots');
+    if(!track || !dots) return;
+    const items = Array.from(track.children);
+    if(!items.length) return;
+    const gap = 12;
+    sliderState.idx = 0;
+
+    function setPos(i){
+      const itemWidth = items[0].getBoundingClientRect().width + gap;
+      track.style.transform = `translateX(${-i * itemWidth}px)`;
+      Array.from(dots.children).forEach((b,bi) => b.classList.toggle('active', bi === i));
     }
 
-    /* ---------- Modal ---------- */
-    function showModal(title='', content='', primary='OK', onPrimary=null, secondary=null, onSecondary=null){
-      closeModal();
-      const wrap = document.createElement('div');
-      wrap.className = 'modal-wrap';
-      wrap.onclick = e => { if(e.target===wrap) closeModal(); };
+    dots.innerHTML = '';
+    items.forEach((_,i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      if(i===0) btn.classList.add('active');
+      btn.title = `Slide ${i+1}`;
+      btn.style.border='0'; btn.style.width='8px'; btn.style.height='8px'; btn.style.borderRadius='6px';
+      btn.addEventListener('click', ()=> { sliderState.idx = i; setPos(i); resetAuto(); });
+      dots.appendChild(btn);
+    });
 
-      const card = document.createElement('div');
-      card.className = 'modal-card';
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <strong style="font-size:17px">${escapeHtml(title)}</strong>
-          <button aria-label="close" style="border:0;background:none;cursor:pointer;font-size:20px">×</button>
+    function next(){ sliderState.idx = (sliderState.idx + 1) % items.length; setPos(sliderState.idx); }
+    function startAuto(){ if(sliderState.timer) clearInterval(sliderState.timer); sliderState.timer = setInterval(next, 4200); }
+    function stopAuto(){ if(sliderState.timer){ clearInterval(sliderState.timer); sliderState.timer = null; } }
+    function resetAuto(){ stopAuto(); startAuto(); }
+
+    // swipe support
+    let startX = 0, isDown = false, curTranslate = 0;
+    track.addEventListener('touchstart', (e)=>{ isDown=true; startX = e.touches[0].clientX; curTranslate = -sliderState.idx * (items[0].getBoundingClientRect().width + gap); track.style.transition='none'; stopAuto(); });
+    track.addEventListener('touchmove', (e)=>{ if(!isDown) return; const dx = e.touches[0].clientX - startX; track.style.transform = `translateX(${curTranslate + dx}px)`; });
+    track.addEventListener('touchend', (e)=>{ if(!isDown) return; isDown=false; track.style.transition=''; const dx = (e.changedTouches[0].clientX - startX); const threshold = Math.min(80, items[0].getBoundingClientRect().width * 0.18); if(dx > threshold) sliderState.idx = Math.max(0, sliderState.idx -1); else if(dx < -threshold) sliderState.idx = Math.min(items.length-1, sliderState.idx+1); setPos(sliderState.idx); startAuto(); });
+
+    setPos(0);
+    startAuto();
+  }
+
+  // -------------------------
+  // Search suggestions (unified)
+  // -------------------------
+  let suggestTimer = null;
+  function debouncedSuggestions(){
+    clearTimeout(suggestTimer);
+    suggestTimer = setTimeout(showSuggestions, 180);
+  }
+
+  function showSuggestions(){
+    const input = document.getElementById('search-box');
+    const box = document.getElementById('suggestions');
+    if(!input || !box) return;
+    const q = input.value.trim().toLowerCase();
+    if(q.length < 2){ box.classList.add('hidden'); return; }
+    const prodMatches = PRODUCTS.filter(p => (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q)).slice(0,6);
+    const list = prodMatches.map(p => p.name);
+    if(!list.length) list.push(`${q} (no direct match)`);
+    box.innerHTML = list.map(item => `<div class="item" onclick="selectSuggestion('${escapeHtml(item)}')">${escapeHtml(item)}</div>`).join('');
+    box.classList.remove('hidden');
+  }
+
+  function selectSuggestion(text){
+    const input = document.getElementById('search-box');
+    if(input) input.value = text;
+    document.getElementById('suggestions')?.classList.add('hidden');
+    const prod = PRODUCTS.find(p => text.toLowerCase().includes((p.name||'').toLowerCase()));
+    if(prod){ navigateHash('product?id=' + encodeURIComponent(prod.id)); }
+    else navigateHash('medicines?q=' + encodeURIComponent(text));
+  }
+
+  // -------------------------
+  // Prescription preview
+  // -------------------------
+  function handlePrescriptionUpload(ev){
+    const file = ev.target.files?.[0];
+    const preview = document.getElementById('prescription-preview');
+    if(!preview) return;
+    if(!file){ preview.innerHTML = ''; return; }
+    if(!file.type.startsWith('image/')) return showToast('Please upload an image file');
+    const reader = new FileReader();
+    preview.innerHTML = `<div class="muted">Loading preview…</div>`;
+    reader.onload = e => {
+      preview.innerHTML = `<div class="file-preview"><img src="${e.target.result}" alt="prescription" /></div>`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // -------------------------
+  // Blood request
+  // -------------------------
+  function handleBloodRequest(formEl){
+    const fm = new FormData(formEl);
+    const patient = String(fm.get('patient')||'').trim();
+    const bg = String(fm.get('blood_group')||'').trim();
+    const addr = String(fm.get('address')||'').trim();
+    if(!patient || !bg || !addr) return showToast('Please fill all required fields');
+    // demo: pretend to notify donors
+    showModal('Request Submitted', `Blood request for <strong>${escapeHtml(patient)}</strong> (Group: ${escapeHtml(bg)}) has been submitted. Donors will be notified.`, 'OK');
+    formEl.reset();
+  }
+
+  // -------------------------
+  // Product rendering & cart actions
+  // -------------------------
+  function renderProductCard(product){
+    return `
+      <div class="card" style="flex-direction:column;align-items:flex-start;">
+        <div style="width:100%;border-radius:10px;overflow:hidden"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" style="width:100%;display:block" /></div>
+        <div style="margin-top:8px;width:100%">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>${escapeHtml(product.name)}</strong><div class="muted" style="font-size:13px">${escapeHtml(product.brand||'')}</div></div>
+            <div style="text-align:right"><div style="font-weight:700">₹${product.price}</div><div class="muted" style="font-size:12px">Stock: ${product.stock}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn-primary" onclick="addToCart('${product.id}'); event.stopPropagation();">Add to cart</button>
+            <button class="btn-link" onclick="navigateHash('product?id=${encodeURIComponent(product.id)}'); event.stopPropagation();">View</button>
+          </div>
         </div>
-        <div style="margin-top:10px;color:var(--color-primary)">${typeof content==='string' ? '<div>'+escapeHtml(content)+'</div>' : content}</div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
-          ${secondary ? '<button id="modal-secondary" style="padding:8px 12px;border-radius:8px;border:1px solid #eee;background:#f6f6f6;cursor:pointer">'+escapeHtml(secondary)+'</button>' : ''}
-          <button id="modal-primary" style="padding:8px 12px;border-radius:8px;background:var(--color-secondary);color:#fff;border:0;cursor:pointer">${escapeHtml(primary)}</button>
+      </div>
+    `;
+  }
+
+  function mountProducts(){
+    const homeGrid = document.getElementById('home-products');
+    if(homeGrid) homeGrid.innerHTML = PRODUCTS.slice(0,6).map(p=>renderProductCard(p)).join('');
+    const allGrid = document.getElementById('all-products');
+    if(allGrid) allGrid.innerHTML = PRODUCTS.map(p=>renderProductCard(p)).join('');
+  }
+
+  // -------------------------
+  // Buy flow (single product)
+  // -------------------------
+  function buyNow(id){
+    const qty = parseInt(document.getElementById('buy-qty')?.value) || 1;
+    const product = PRODUCTS.find(p=>p.id==id);
+    if(!product) return alert('Product not found');
+    // simple validation: address fields or redhop code required
+    const tehsil = document.getElementById('buy-tehsil')?.value;
+    const post = document.getElementById('buy-post')?.value;
+    const address = document.getElementById('buy-address')?.value;
+    const pincode = document.getElementById('buy-pincode')?.value;
+    const redhop = document.getElementById('buy-redhop')?.value;
+    const deliveryMethod = document.querySelector('input[name="buy-delivery"]:checked')?.value || '4_hours';
+    if((!tehsil || !post || !address || !pincode) && !redhop) return alert('Fill address fields or provide redhop code');
+    const deliveryCharges = (deliveryMethod === '15_minutes' && product.price * qty < 249) ? 7 : 0;
+    const orderData = { product, quantity: qty, customerDetails: { tehsil, post, address, pincode, redhop }, deliveryMethod, deliveryCharges, totalPrice: product.price * qty + deliveryCharges };
+    sessionStorage.setItem('orderData', JSON.stringify(orderData));
+    navigateHash('place-order');
+  }
+
+  // -------------------------
+  // Cart -> Place order flow
+  // -------------------------
+  function validateAndPlaceCart(){
+    const tehsil = document.getElementById('cart-tehsil')?.value || '';
+    const post = document.getElementById('cart-post')?.value || '';
+    const address = document.getElementById('cart-address')?.value || '';
+    const pincode = document.getElementById('cart-pincode')?.value || '';
+    const redhop = document.getElementById('cart-redhop')?.value || '';
+    if((!tehsil || !post || !address || !pincode) && !redhop){ alert('Please fill address fields or provide redhop Code'); return; }
+    const cart = loadCart();
+    if(cart.length === 0) return alert('Cart is empty');
+    const deliveryMethod = document.querySelector('input[name="cart-delivery"]:checked')?.value || '4_hours';
+    const customerDetails = { tehsil, post, address, pincode, redhop, deliveryMethod };
+    const orderData = { cart: cart.map(c => ({ ...c })), customerDetails };
+    localStorage.setItem('orderData', JSON.stringify(orderData));
+    navigateHash('place-order');
+  }
+
+  // -------------------------
+  // Send order to Telegram (demo)
+  // Replace BOTS with your secure values or move to server
+  // -------------------------
+  const BOTS = [
+    // Example placeholder format: { token: "BOT_TOKEN", chatId: "CHAT_ID" }
+    { token: "REPLACE_WITH_BOT_TOKEN", chatId: "REPLACE_WITH_CHAT_ID", label: "main" }
+  ];
+
+  function sendOrderToTelegram(){
+    const orderData = JSON.parse(localStorage.getItem('orderData') || sessionStorage.getItem('orderData') || 'null');
+    if(!orderData) return alert('Order not found');
+    // build message
+    let msg = "🛒 *New Order Received* \n\n";
+    if(orderData.cart && orderData.cart.length){
+      orderData.cart.forEach(ci => {
+        const p = PRODUCTS.find(pp => pp.id == ci.id) || ci;
+        msg += `• ${p.name} × ${ci.quantity} — ₹${(p.price||0) * (ci.quantity||1)}\n`;
+      });
+    } else if(orderData.product){
+      msg += `• ${orderData.product.name} × ${orderData.quantity} — ₹${(orderData.product.price||0) * (orderData.quantity||1)}\n`;
+    }
+    const customer = orderData.customerDetails || orderData.customer || {};
+    const deliveryMethod = customer.deliveryMethod || orderData.deliveryMethod || 'standard';
+    const total = orderData.totalPrice || (orderData.cart ? orderData.cart.reduce((s,i)=>s + ((PRODUCTS.find(p=>p.id==i.id)?.price||0) * (i.quantity||1)), 0) : 0);
+    msg += `\n*Total:* ₹${total}\n*Delivery:* ${deliveryMethod}\n`;
+    if(customer.address) msg += `\n*Address:* ${customer.address}\n`;
+    // send to each bot (demo)
+    BOTS.forEach(bot => {
+      if(!bot.token || !bot.chatId) return console.warn('Telegram bot token/chatId not configured.');
+      fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: bot.chatId, text: msg, parse_mode: 'Markdown' })
+      }).then(r => r.json()).then(d => {
+        // no-op
+      }).catch(err => console.error('Telegram send failed', err));
+    });
+
+    // save to local orders (demo)
+    const previous = JSON.parse(localStorage.getItem('yourOrders') || '[]');
+    previous.unshift({ products: orderData.cart || [ { id: orderData.product?.id, qty: orderData.quantity } ], totalPrice: total, date: new Date().toLocaleString() });
+    localStorage.setItem('yourOrders', JSON.stringify(previous));
+
+    // remove ordered items from cart if it was a cart order
+    if(orderData.cart && orderData.cart.length){
+      const current = loadCart();
+      // naive remove: remove all items that were in order
+      const remaining = current.filter(c => !orderData.cart.some(o => o.id === c.id));
+      saveCart(remaining);
+    }
+    localStorage.removeItem('orderData');
+    sessionStorage.removeItem('orderData');
+    showToast('Order submitted');
+    renderCurrentRoute();
+  }
+
+  // -------------------------
+  // Login / OTP (demo)
+  // Immediate OTP boxes creation
+  // -------------------------
+  const SCRIPT_OTP_URL = "https://script.google.com/macros/s/AKfycbz2rDUbbm_c0nZJIBOBYG9GIiG37AwORYvLj1jdF0xX5OCf-H2SI3cyS2X77q8uySi7MQ/exec";
+
+  function sendOTP(){
+    const name = document.getElementById('login-name')?.value?.trim();
+    const phone = document.getElementById('login-phone')?.value?.trim();
+    const email = document.getElementById('login-email')?.value?.trim();
+    if(!name || !phone || !email) return alert('Please fill name, phone, and email');
+    if(!/^\d{10}$/.test(phone)) return alert('Enter 10 digit phone number');
+    // store basic details
+    localStorage.setItem('user_name', name);
+    localStorage.setItem('user_phone', phone);
+    localStorage.setItem('user_email', email);
+    // render OTP boxes right away
+    renderOTPBoxes();
+    document.getElementById('otp-message').innerText = 'Sending OTP...';
+    // try to send via Google Script if available
+    if(SCRIPT_OTP_URL){
+      fetch(SCRIPT_OTP_URL + '?action=sendOTP&email=' + encodeURIComponent(email)).then(r=>r.text()).then(txt => {
+        document.getElementById('otp-message').innerText = 'OTP sent (check email) — demo.';
+      }).catch(e => {
+        document.getElementById('otp-message').innerText = 'OTP (demo) — check your email if integrated.';
+      });
+    } else {
+      document.getElementById('otp-message').innerText = 'OTP (demo) — check email.';
+    }
+  }
+
+  function renderOTPBoxes(){
+    const box = document.getElementById('otp-boxes');
+    if(!box) return;
+    box.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.gap = '6px';
+    for(let i=0;i<6;i++){
+      const ip = document.createElement('input');
+      ip.maxLength = 1;
+      ip.className = 'otp-box';
+      ip.style.width = '40px';
+      ip.style.height = '40px';
+      ip.style.fontSize = '18px';
+      ip.style.textAlign = 'center';
+      ip.oninput = function(){ if(this.value && this.nextElementSibling) this.nextElementSibling.focus(); };
+      wrap.appendChild(ip);
+    }
+    box.appendChild(wrap);
+  }
+
+  function verifyOTP(){
+    const email = document.getElementById('login-email')?.value?.trim();
+    const inputs = document.querySelectorAll('.otp-box');
+    let otp = '';
+    inputs.forEach(i => otp += (i.value || ''));
+    if(otp.length !== 6) return alert('Enter 6 digit OTP');
+    document.getElementById('otp-message').innerText = 'Verifying...';
+    if(SCRIPT_OTP_URL){
+      fetch(SCRIPT_OTP_URL + '?action=verifyOTP&email=' + encodeURIComponent(email) + '&otp=' + encodeURIComponent(otp)).then(r=>r.text()).then(txt => {
+        document.getElementById('otp-message').innerText = txt;
+        if(txt.toLowerCase().includes('verified') || txt.toLowerCase().includes('success')){
+          localStorage.setItem('user_verified', String(Date.now()));
+          showToast('Logged in');
+          renderCurrentRoute();
+        }
+      }).catch(e => {
+        document.getElementById('otp-message').innerText = 'Verification failed (demo).';
+      });
+    } else {
+      // demo fallback
+      localStorage.setItem('user_verified', String(Date.now()));
+      document.getElementById('otp-message').innerText = 'OTP verified (demo).';
+      showToast('Logged in (demo)');
+      renderCurrentRoute();
+    }
+  }
+
+  function logout(){
+    localStorage.removeItem('user_verified');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_phone');
+    localStorage.removeItem('user_email');
+    showToast('Logged out');
+    navigateHash('home');
+  }
+
+  // -------------------------
+  // Pages rendering functions
+  // -------------------------
+  function renderHome(){
+    return `
+      <div class="page">
+        <div class="search-wrapper">
+          <div class="search-box">
+            <input id="search-box" placeholder="Search medicines or donors..." oninput="debouncedSuggestions()" aria-label="Search" />
+            <button title="Search" onclick="searchProducts()">
+              🔍
+            </button>
+          </div>
+          <div id="suggestions" class="suggestions hidden"></div>
+        </div>
+
+        <div class="slider-container">
+          <div id="slider-track" class="slider-track">
+            <div class="slide si-accent">
+              <div>
+                <div style="font-size:13px;font-weight:600">Up to 30% OFF</div>
+                <div style="font-size:22px;font-weight:800;margin:6px 0">Diabetic Care</div>
+                <div style="font-size:12px;opacity:.95">Lowest prices</div>
+              </div>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M21 7l-8 8M21 7h-8v8" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+
+            <div class="slide si-danger">
+              <div>
+                <div style="font-size:13px;font-weight:600">Life Saving Network</div>
+                <div style="font-size:22px;font-weight:800;margin:6px 0">5M+ Donors</div>
+                <div style="font-size:12px;opacity:.95">Request blood fast</div>
+              </div>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M12 2C12 2 7 6 7 10a5 5 0 0010 0c0-4-5-8-5-8z" stroke="white" stroke-width="1.6"/></svg>
+            </div>
+
+            <div class="slide si-primary">
+              <div>
+                <div style="font-size:13px;font-weight:600">Special Offer</div>
+                <div style="font-size:22px;font-weight:800;margin:6px 0">Full Body Checkup</div>
+                <div style="font-size:12px;opacity:.95">Book tests & packages</div>
+              </div>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M19 11c0 4-7 9-7 9s-7-5-7-9a7 7 0 0114 0z" stroke="white" stroke-width="1.6"/></svg>
+            </div>
+          </div>
+
+          <div id="slider-dots" class="slider-dots"></div>
+        </div>
+
+        <section style="margin-top:16px">
+          <h2 class="section-title">Core Services</h2>
+          <div class="grid cols-3">
+            <div class="card" onclick="navigateHash('medicines')" role="button" style="cursor:pointer">
+              <div class="icon teal" aria-hidden>💊</div>
+              <div>
+                <div style="font-weight:700">Order Medicines</div>
+                <div class="muted" style="font-size:13px">Fast doorstep delivery</div>
+              </div>
+            </div>
+
+            <div class="card" onclick="navigateHash('request_blood')" role="button" style="cursor:pointer">
+              <div class="icon red">🩸</div>
+              <div>
+                <div style="font-weight:700">Request Blood</div>
+                <div class="muted" style="font-size:13px">Notify donors nearby</div>
+              </div>
+            </div>
+
+            <div class="card" onclick="showModal('Emergency','In a life-threatening emergency, call local services immediately','OK')" role="button" style="cursor:pointer">
+              <div class="icon dark">🚨</div>
+              <div>
+                <div style="font-weight:700">Emergency</div>
+                <div style="font-size:13px;color:var(--color-danger);font-weight:700">Immediate assistance</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section style="margin-top:18px">
+          <h2 class="section-title">Popular products</h2>
+          <div id="home-products" class="grid cols-3"></div>
+        </section>
+      </div>
+    `;
+  }
+
+  function renderMedicines(){
+    return `
+      <div class="page">
+        <h2 class="section-title">Order Medicines</h2>
+
+        <div style="background:#fff;padding:14px;border-radius:12px;box-shadow:var(--card-shadow);margin-bottom:12px">
+          <div style="font-weight:700">Upload Prescription (optional)</div>
+          <div style="margin-top:10px">
+            <input id="prescription-upload" type="file" accept="image/*" />
+            <div id="prescription-preview"></div>
+          </div>
+        </div>
+
+        <div style="background:#fff;padding:14px;border-radius:12px;box-shadow:var(--card-shadow);margin-bottom:12px">
+          <div style="display:flex;gap:8px">
+            <input id="med-search" placeholder="Enter medicine or brand name..." />
+            <button class="btn-primary" onclick="doProductsSearch()">Search</button>
+          </div>
+        </div>
+
+        <div id="all-products" class="grid cols-3"></div>
+      </div>
+    `;
+  }
+
+  function renderRequestBloodPage(){
+    return `
+      <div class="page">
+        <h2 class="section-title">Blood Request</h2>
+        <form id="blood-form" style="background:#fff;padding:14px;border-radius:12px;box-shadow:var(--card-shadow)">
+          <div style="display:grid;gap:8px">
+            <input name="patient" placeholder="Patient name" required />
+            <select name="blood_group" required>
+              <option value="">Select blood group *</option>
+              <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
+              <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
+            </select>
+            <textarea name="address" rows="3" placeholder="Hospital address & contact (urgent)" required></textarea>
+          </div>
+          <div style="margin-top:10px">
+            <button class="btn-primary" type="submit">Find Donors</button>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  function renderProductDetail(id){
+    const product = PRODUCTS.find(p => p.id == id);
+    if(!product) return `<div class="page"><p>Product not found</p></div>`;
+    return `
+      <div class="page">
+        <div style="display:grid;gap:12px;">
+          <div class="card" style="flex-direction:column;align-items:flex-start">
+            <div style="width:100%;overflow:hidden;border-radius:10px"><img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" style="display:block;width:100%"></div>
+            <h2 style="margin:6px 0">${escapeHtml(product.name)}</h2>
+            <div class="muted">Brand: ${escapeHtml(product.brand || 'N/A')}</div>
+            <h3>₹${product.price}</h3>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+              <label>Qty:</label><input id="buy-qty" type="number" value="1" min="1" style="width:80px" />
+              <button class="btn-primary" onclick="buyNow('${product.id}')">Buy Now</button>
+              <button class="btn-link" onclick="addToCart('${product.id}')">Add to cart</button>
+            </div>
+
+            <hr>
+
+            <h4>Delivery & Address</h4>
+            <div style="display:grid;gap:8px">
+              <select id="buy-tehsil"><option value="">Choose tehsil</option><option>Bayana</option></select>
+              <select id="buy-post"><option>Anaj Mandi</option></select>
+              <textarea id="buy-address" placeholder="House no, street..." rows="2"></textarea>
+              <input id="buy-pincode" placeholder="PIN code" />
+              <input id="buy-redhop" placeholder="redhop Code (optional)" />
+              <div>
+                <label><input type="radio" name="buy-delivery" value="15_minutes" checked /> 15 Min (₹7 if order < ₹249)</label><br/>
+                <label><input type="radio" name="buy-delivery" value="4_hours" /> 2 Hours (Free)</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCartPage(){
+    const cart = loadCart();
+    if(cart.length === 0) return `<div class="page"><h2>Your cart is empty</h2></div>`;
+    let html = `<div class="page"><h2>Your Cart</h2><div id="cart-list">`;
+    cart.forEach((it, idx) => {
+      const p = PRODUCTS.find(pp => pp.id == it.id) || { name: 'Unknown', price: 0, image: '' };
+      html += `
+        <div class="card" style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:72px"><img src="${escapeHtml(p.image)}" style="width:100%;border-radius:8px"/></div>
+            <div>
+              <div><strong>${escapeHtml(p.name)}</strong></div>
+              <div class="muted">₹${p.price}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <button onclick="changeQty(${idx}, -1)">-</button>
+              <input id="qty-${idx}" type="number" value="${it.quantity}" min="1" style="width:60px;text-align:center" />
+              <button onclick="changeQty(${idx}, 1)">+</button>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="btn-link">Remove</button>
+          </div>
         </div>
       `;
-      card.querySelector('button[aria-label="close"]').onclick = closeModal;
-      wrap.appendChild(card);
-      document.getElementById('modal-container').appendChild(wrap);
+    });
+    html += `</div><hr><div>
+      <h3>Delivery details</h3>
+      <select id="cart-tehsil"><option>Bayana</option></select>
+      <select id="cart-post"><option>Anaj Mandi</option></select>
+      <textarea id="cart-address" rows="2" placeholder="Address"></textarea>
+      <input id="cart-pincode" placeholder="PIN code" />
+      <input id="cart-redhop" placeholder="redhop Code (optional)" />
+      <div style="margin-top:8px">
+        <label><input type="radio" name="cart-delivery" value="15_minutes" checked/> 15 Minutes (₹7)</label>
+        <label style="margin-left:8px"><input type="radio" name="cart-delivery" value="4_hours"/> 2 Hours (Free)</label>
+      </div>
+      <div style="margin-top:12px"><button class="btn-primary" onclick="validateAndPlaceCart()">Place Order</button></div>
+    </div></div>`;
+    return html;
+  }
 
-      if(secondary) card.querySelector('#modal-secondary').onclick = () => { if(onSecondary) onSecondary(); closeModal(); };
-      card.querySelector('#modal-primary').onclick = () => { if(onPrimary) onPrimary(); closeModal(); };
-    }
-    function closeModal(){ const el = document.querySelector('.modal-wrap'); if(el) el.remove(); }
-
-    /* ---------- Chat ---------- */
-    function toggleChatbot(){
-      const modal = document.getElementById('chatbot-modal');
-      modal.classList.toggle('hidden');
-      if(!modal.classList.contains('hidden')){
-        setTimeout(()=> $('#chat-input', modal).focus(), 80);
-      }
-    }
-    async function handleChatSubmit(){
-      const input = $('#chat-input', document);
-      if(!input) return;
-      const q = input.value.trim();
-      if(!q) return;
-      const messages = $('#chat-messages', document);
-      // user bubble
-      const me = document.createElement('div');
-      me.className = 'bubble me';
-      me.style.display = 'block';
-      me.style.marginLeft = 'auto';
-      me.textContent = q;
-      messages.appendChild(me);
-      input.value = '';
-      messages.scrollTop = messages.scrollHeight;
-
-      // loading
-      const loader = document.createElement('div');
-      loader.className = 'bubble ai';
-      loader.textContent = 'Thinking...';
-      messages.appendChild(loader);
-      messages.scrollTop = messages.scrollHeight;
-
-      // simulated response
-      await new Promise(r => setTimeout(r, 700));
-      loader.remove();
-      const resp = document.createElement('div');
-      resp.className = 'bubble ai';
-      resp.style.display = 'inline-block';
-      resp.textContent = "Thanks — this demo assistant is offline. For medical concerns, consult a healthcare professional.";
-      messages.appendChild(resp);
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    /* ---------- Suggestions (debounced) ---------- */
-    let suggestTimer = null;
-    function debouncedSuggestions(){
-      clearTimeout(suggestTimer);
-      suggestTimer = setTimeout(showSuggestions, 220);
-    }
-    function showSuggestions(){
-      const suggestions = document.getElementById('suggestions');
-      const input = document.getElementById('search-box');
-      if(!suggestions || !input) return;
-      const q = input.value.trim();
-      if(q.length < 2){ suggestions.classList.add('hidden'); return; }
-      const list = [
-        `${q} — Paracetamol 500mg`,
-        `${q} — Diabetic Care Kit`,
-        `${q} — O- Blood Donors`
-      ];
-      suggestions.innerHTML = list.map(item => `<div class="item" role="option" tabindex="0" onclick="selectSuggestion('${escapeHtml(item)}')">${escapeHtml(item)}</div>`).join('');
-      suggestions.classList.remove('hidden');
-    }
-    function selectSuggestion(text){
-      const input = document.getElementById('search-box');
-      if(input) input.value = text;
-      document.getElementById('suggestions')?.classList.add('hidden');
-      searchProducts();
-    }
-    function searchProducts(){
-      const q = document.getElementById('search-box')?.value.trim() || '';
-      if(!q) return showToast('Enter search term');
-      showModal('Search', `Searching for "${escapeHtml(q)}" — this is a simulated demo.`, 'OK');
-    }
-
-    /* ---------- Prescription preview ---------- */
-    function handlePrescriptionUpload(ev){
-      const file = ev.target.files?.[0];
-      const preview = document.getElementById('prescription-preview');
-      if(!preview) return;
-      if(!file){ preview.innerHTML = ''; return; }
-      if(!file.type.startsWith('image/')) return showToast('Please upload an image');
-      const reader = new FileReader();
-      preview.innerHTML = `<div style="color:var(--muted)">Loading preview…</div>`;
-      reader.onload = e => {
-        preview.innerHTML = `<div class="file-preview"><img src="${e.target.result}" alt="prescription" /></div>`;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    /* ---------- Blood request ---------- */
-    function handleBloodRequest(formEl){
-      const fm = new FormData(formEl);
-      const patient = String(fm.get('patient')||'').trim();
-      const bg = String(fm.get('blood_group')||'').trim();
-      const addr = String(fm.get('address')||'').trim();
-      if(!patient || !bg || !addr) return showToast('Please fill all required fields');
-      showModal('Request Submitted', 'Your urgent blood request has been submitted. Matching donors will be notified.', 'Done');
-      formEl.reset();
-    }
-
-    /* ---------- Slider (dots + swipe + autoplay) ---------- */
-    let sliderState = { timer:null, idx:0 };
-    function initSlider(){
-      const track = document.getElementById('slider-track');
-      const dotsWrap = document.getElementById('slider-dots');
-      if(!track || !dotsWrap) return;
-      const items = Array.from(track.children);
-      if(!items.length) return;
-      const gap = 12;
-      sliderState.idx = 0;
-      function setPos(i){
-        const itemWidth = items[0].getBoundingClientRect().width + gap;
-        track.style.transform = `translateX(${-i * itemWidth}px)`;
-        Array.from(dotsWrap.children).forEach((b,bi) => b.classList.toggle('active', bi === i));
-      }
-      // dots
-      dotsWrap.innerHTML = '';
-      items.forEach((_,i) => {
-        const btn = document.createElement('button');
-        btn.type='button';
-        if(i===0) btn.classList.add('active');
-        btn.title = `Slide ${i+1}`;
-        btn.addEventListener('click', ()=> { sliderState.idx = i; setPos(i); resetAuto(); });
-        dotsWrap.appendChild(btn);
+  function renderPlaceOrder(){
+    const orderData = JSON.parse(localStorage.getItem('orderData') || sessionStorage.getItem('orderData') || 'null');
+    if(!orderData) return `<div class="page"><h2>No order found</h2></div>`;
+    let html = `<div class="page"><h2>Order Summary</h2>`;
+    let total = 0;
+    if(orderData.cart && orderData.cart.length){
+      orderData.cart.forEach(item => {
+        const p = PRODUCTS.find(pp => pp.id == item.id) || { name: 'Unknown', price: 0 };
+        const q = item.quantity || 1;
+        total += (p.price || 0) * q;
+        html += `<div class="card"><div><strong>${escapeHtml(p.name)}</strong></div><div>Qty: ${q} — ₹${(p.price||0)*q}</div></div>`;
       });
+    } else if(orderData.product){
+      const p = orderData.product;
+      const q = orderData.quantity || 1;
+      total += (p.price || 0) * q;
+      html += `<div class="card"><div><strong>${escapeHtml(p.name)}</strong></div><div>Qty: ${q} — ₹${(p.price||0)*q}</div></div>`;
+    }
+    const deliveryCharges = orderData.customerDetails?.deliveryMethod === '15_minutes' && total < 249 ? 7 : 0;
+    total += deliveryCharges;
+    html += `<hr><div style="margin-top:8px"><div>Delivery Charges: ₹${deliveryCharges}</div><h3>Total: ₹${total}</h3></div>`;
+    html += `<div style="margin-top:12px"><button class="btn-primary" onclick="sendOrderToTelegram()">ORDER NOW</button></div></div>`;
+    return html;
+  }
 
-      // touch/mouse drag
-      let startX=0, isDragging=false, curTranslate=0;
-      function onStart(e){
-        isDragging = true;
-        startX = (e.touches?e.touches[0].clientX:e.clientX);
-        curTranslate = -sliderState.idx * (items[0].getBoundingClientRect().width + gap);
-        track.style.transition = 'none';
-        stopAuto();
-      }
-      function onMove(e){
-        if(!isDragging) return;
-        const x = (e.touches?e.touches[0].clientX:e.clientX);
-        const dx = x - startX;
-        track.style.transform = `translateX(${curTranslate + dx}px)`;
-      }
-      function onEnd(e){
-        if(!isDragging) return;
-        isDragging = false;
-        track.style.transition = '';
-        const x = (e.changedTouches?e.changedTouches[0].clientX:e.clientX);
-        const dx = x - startX;
-        const threshold = Math.min(80, items[0].getBoundingClientRect().width * 0.18);
-        if(dx > threshold) sliderState.idx = Math.max(0, sliderState.idx -1);
-        else if(dx < -threshold) sliderState.idx = Math.min(items.length -1, sliderState.idx +1);
-        setPos(sliderState.idx);
-        startAuto();
-      }
-      track.addEventListener('touchstart', onStart, {passive:true});
-      track.addEventListener('touchmove', onMove, {passive:true});
-      track.addEventListener('touchend', onEnd);
-      track.addEventListener('mousedown', onStart);
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onEnd);
+  function renderOrdersPage(){
+    const orders = JSON.parse(localStorage.getItem('yourOrders') || '[]');
+    let html = `<div class="page"><h2>Your Orders</h2>`;
+    if(!orders.length) html += '<p>No orders yet.</p>';
+    orders.forEach((o, idx) => {
+      html += `<div class="card" style="flex-direction:column;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;width:100%"><strong>Order ${idx+1}</strong><div>${escapeHtml(o.date)}</div></div>
+        <div class="muted">Total: ₹${o.totalPrice}</div>
+      </div>`;
+    });
+    html += '</div>';
+    return html;
+  }
 
-      function next(){ sliderState.idx = (sliderState.idx + 1) % items.length; setPos(sliderState.idx); }
-      function startAuto(){ sliderState.timer = setInterval(next, 4500); }
-      function stopAuto(){ if(sliderState.timer){ clearInterval(sliderState.timer); sliderState.timer = null; } }
-      function resetAuto(){ stopAuto(); startAuto(); }
-      track.parentElement.addEventListener('mouseenter', stopAuto);
-      track.parentElement.addEventListener('mouseleave', startAuto);
+  function renderLoginPage(){
+    return `
+      <div class="page">
+        <h2>Sign up / Login</h2>
+        <div style="display:grid;gap:8px;max-width:480px">
+          <input id="login-name" placeholder="Full name" />
+          <input id="login-phone" placeholder="10 digit phone" />
+          <input id="login-email" placeholder="Email address" />
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="sendOTP()">Send OTP</button>
+            <button class="btn-link" onclick="navigateHash('home')">Cancel</button>
+          </div>
+          <div id="otp-message" class="muted"></div>
+          <div id="otp-boxes"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="verifyOTP()">Verify OTP</button>
+            <button class="btn-link" onclick="logout()">Logout</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
-      setPos(0);
-      startAuto();
+  function renderAccountPage(){
+    const verified = localStorage.getItem('user_verified');
+    const name = localStorage.getItem('user_name') || '';
+    const phone = localStorage.getItem('user_phone') || '';
+    const email = localStorage.getItem('user_email') || '';
+    if(!verified) return `<div class="page"><h2>Account</h2><p>You are not logged in. <button class="btn-primary" onclick="navigateHash('login')">Login</button></p></div>`;
+    return `<div class="page"><h2>Welcome, ${escapeHtml(name)}</h2>
+      <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      <div style="margin-top:12px"><button class="btn-primary" onclick="logout()">Logout</button></div>
+    </div>`;
+  }
+
+  function renderPlaceholder(page){
+    return `<div class="page"><h2>${escapeHtml(page)} coming soon</h2><p class="muted">This feature will be available soon.</p></div>`;
+  }
+
+  // -------------------------
+  // Search & misc
+  // -------------------------
+  function searchProducts(){
+    const q = (document.getElementById('search-box')?.value || '').trim();
+    if(!q) return showToast('Enter search term');
+    navigateHash('medicines?q=' + encodeURIComponent(q));
+  }
+  function doProductsSearch(){
+    const q = document.getElementById('med-search')?.value || '';
+    if(!q) return showToast('Enter search term');
+    navigateHash('medicines?q=' + encodeURIComponent(q));
+  }
+  function filterProducts(){
+    const q = (document.getElementById('filter-q')?.value || '').toLowerCase();
+    const grid = document.getElementById('all-products');
+    if(!grid) return;
+    const filtered = PRODUCTS.filter(p=> p.name.toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q));
+    grid.innerHTML = filtered.map(p=>renderProductCard(p)).join('');
+  }
+
+  // -------------------------
+  // Router render
+  // -------------------------
+  function renderCurrentRoute(){
+    const { page, qs } = parseHash();
+    setActiveNav(page);
+    const content = document.getElementById('app-content');
+    if(!content) return;
+    // hide suggestions
+    document.getElementById('suggestions')?.classList.add('hidden');
+
+    switch(page){
+      case 'medicines':
+        content.innerHTML = renderMedicines();
+        break;
+      case 'product': {
+        const params = new URLSearchParams(qs);
+        const id = params.get('id');
+        content.innerHTML = renderProductDetail(id);
+        break;
+      }
+      case 'cart':
+        content.innerHTML = renderCartPage();
+        break;
+      case 'place-order':
+        content.innerHTML = renderPlaceOrder();
+        break;
+      case 'orders':
+        content.innerHTML = renderOrdersPage();
+        break;
+      case 'login':
+        content.innerHTML = renderLoginPage();
+        break;
+      case 'account':
+        content.innerHTML = renderAccountPage();
+        break;
+      case 'request_blood':
+        content.innerHTML = renderRequestBloodPage();
+        break;
+      case 'home':
+      default:
+        content.innerHTML = renderHome();
+        break;
     }
 
-    /* ---------- router & pages ---------- */
-    function route(page){
-      const content = document.getElementById('app-content');
-      if(!content) return;
-      setActiveNav(page||'home');
-      switch(page){
-        case 'medicines': content.innerHTML = renderMedicinesPage(); break;
-        case 'request_blood': content.innerHTML = renderRequestBloodPage(); break;
-        case 'account': content.innerHTML = renderAccountPage(); break;
-        case 'nearby':
-        case 'history': content.innerHTML = renderPlaceholder(page); break;
-        default: content.innerHTML = renderHomePage();
-      }
-      // attach post render behaviours
-      // icons are inline SVGs, nothing external needed
-      // init slider on home
-      if(page==='home' || typeof page === 'undefined') setTimeout(initSlider, 60);
-
-      // attach file input change globally
+    // attach post-render hooks
+    setTimeout(()=> {
+      // prescription upload handler
       const pres = document.getElementById('prescription-upload');
       if(pres) pres.onchange = handlePrescriptionUpload;
 
+      // blood form
       const blood = document.getElementById('blood-form');
-      if(blood) blood.onsubmit = e => { e.preventDefault(); handleBloodRequest(blood); };
-    }
-    window.route = route;
+      if(blood) blood.onsubmit = (e) => { e.preventDefault(); handleBloodRequest(blood); };
 
-    function setActiveNav(page){
-      ['home','nearby','history','account'].forEach(p => {
-        const el = document.getElementById('nav-'+p);
-        if(!el) return;
-        el.classList.toggle('active', page === 'home' ? p==='home' : p===page);
-      });
-    }
+      // search on med page: pre-fill if q param exists
+      if(page === 'medicines'){
+        const params = new URLSearchParams(qs);
+        const q = params.get('q') || '';
+        if(q) document.getElementById('med-search').value = q;
+      }
 
-    /* ---------- templates ---------- */
-    function renderHomePage(){
-      return `
-        <div class="page">
-          <div class="search-wrapper">
-            <div class="search-box">
-              <input id="search-box" placeholder="Search medicines or donors..." oninput="debouncedSuggestions()" aria-label="Search" />
-              <button class="btn" title="Search" onclick="searchProducts()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
-              </button>
-            </div>
-            <div id="suggestions" class="suggestions hidden" aria-hidden="true"></div>
-          </div>
+      // mount products
+      mountProducts();
 
-          <div class="slider-container">
-            <div id="slider-track" class="slider-track" style="will-change:transform">
-              <div class="slide si-accent">
-                <div>
-                  <div style="font-size:13px;font-weight:600">Up to 30% OFF</div>
-                  <div style="font-size:22px;font-weight:800;margin:6px 0">Diabetic Care</div>
-                  <div style="font-size:12px;opacity:.9">Lowest prices</div>
-                </div>
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M21 7l-8 8M21 7h-8v8" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+      // init slider
+      if(page === 'home') setTimeout(initSlider, 80);
 
-              <div class="slide si-danger">
-                <div>
-                  <div style="font-size:13px;font-weight:600">Life Saving Network</div>
-                  <div style="font-size:22px;font-weight:800;margin:6px 0">5M+ Donors</div>
-                  <div style="font-size:12px;opacity:.9">Request free blood</div>
-                </div>
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M12 2C12 2 7 6 7 10a5 5 0 0010 0c0-4-5-8-5-8z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+      // update cart count
+      updateCartCount();
 
-              <div class="slide si-primary">
-                <div>
-                  <div style="font-size:13px;font-weight:600">Special Offer</div>
-                  <div style="font-size:22px;font-weight:800;margin:6px 0">Full Body Checkup</div>
-                  <div style="font-size:12px;opacity:.9">Book lab tests</div>
-                </div>
-                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" opacity="0.5"><path d="M19 11c0 4-7 9-7 9s-7-5-7-9a7 7 0 0114 0z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-            </div>
-
-            <div id="slider-dots" class="slider-dots" style="padding:8px 0; display:flex; justify-content:center"></div>
-          </div>
-
-          <section style="margin-top:18px">
-            <h2 class="section-title">Core Services</h2>
-            <div class="grid cols-3">
-              <div class="card" onclick="route('medicines')">
-                <div class="icon teal" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 12h12" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </div>
-                <div>
-                  <div style="font-weight:700">Order Medicines</div>
-                  <div class="muted" style="font-size:13px">Fast delivery</div>
-                </div>
-              </div>
-
-              <div class="card" onclick="route('request_blood')">
-                <div class="icon red" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2s4 4 4 7a4 4 0 11-8 0c0-3 4-7 4-7z" stroke="white" stroke-width="1.6"/></svg>
-                </div>
-                <div>
-                  <div style="font-weight:700">Request Blood</div>
-                  <div class="muted" style="font-size:13px">5M+ donors</div>
-                </div>
-              </div>
-
-              <div class="card" onclick="showModal('Emergency','Call your local emergency number immediately if life is at risk','OK')">
-                <div class="icon dark" aria-hidden>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4-9 4-9-4 9-4z" stroke="white" stroke-width="1.6"/></svg>
-                </div>
-                <div>
-                  <div style="font-weight:700">Emergency Help</div>
-                  <div style="font-size:13px;color:var(--color-danger);font-weight:700">Immediate assistance</div>
-                </div>
-              </div>
-
-            </div>
-          </section>
-        </div>
-      `;
-    }
-
-    function renderMedicinesPage(){
-      return `
-        <div class="page">
-          <h2 class="section-title">Order Medicines</h2>
-
-          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow);border:1px dashed #e6eef4;margin-bottom:12px">
-            <div style="font-weight:700">Upload Prescription</div>
-            <div style="margin-top:10px">
-              <input id="prescription-upload" type="file" accept="image/*" />
-              <div id="prescription-preview" style="margin-top:12px"></div>
-            </div>
-          </div>
-
-          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
-            <div style="display:flex;gap:8px">
-              <input id="med-search" placeholder="Enter medicine or brand name..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #e7eef4" />
-              <button onclick="showToast('Search simulated')" style="padding:10px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0;cursor:pointer">Search</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderRequestBloodPage(){
-      return `
-        <div class="page">
-          <h2 class="section-title">Blood Request</h2>
-          <form id="blood-form" style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
-            <div style="display:grid;gap:10px;grid-template-columns:repeat(1,1fr)">
-              <input name="patient" placeholder="Patient Name" required style="padding:10px;border-radius:10px;border:1px solid #e7eef4" />
-              <select name="blood_group" required style="padding:10px;border-radius:10px;border:1px solid #e7eef4">
-                <option value="">Select Blood Group *</option>
-                <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
-                <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
-              </select>
-            </div>
-            <textarea name="address" rows="3" placeholder="Hospital address & contact details (urgent)" required style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e7eef4"></textarea>
-            <button type="submit" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;background:var(--color-danger);color:white;border:0">Find Donors</button>
-          </form>
-        </div>
-      `;
-    }
-
-    function renderAccountPage(){
-      return `
-        <div class="page">
-          <h2 class="section-title">My Account</h2>
-          <div style="background:#fff;padding:16px;border-radius:14px;box-shadow:var(--card-shadow)">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:64px;height:64px;border-radius:999px;background:#e6eef4;display:flex;align-items:center;justify-content:center">JS</div>
-              <div>
-                <div style="font-weight:700">John Smith</div>
-                <div class="muted">john.smith@example.com</div>
-                <div style="color:var(--color-secondary);font-size:13px;margin-top:6px">+91 98765 43210</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderPlaceholder(page){
-      const title = page.charAt(0).toUpperCase()+page.slice(1);
-      return `
-        <div class="page" style="min-height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center">
-          <div style="width:56px;height:56px;border-radius:12px;background:#f3f6f8;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 8v4" stroke="#9aa0a6" stroke-width="1.4" stroke-linecap="round"/></svg>
-          </div>
-          <h3 style="font-size:20px;margin:6px 0">${escapeHtml(title)} coming soon</h3>
-          <p class="muted">Working on advanced ${escapeHtml(title)} features. Check back soon.</p>
-          <button onclick="route('home')" style="margin-top:12px;padding:8px 12px;border-radius:10px;background:var(--color-secondary);color:white;border:0">Back to Home</button>
-        </div>
-      `;
-    }
-
-    /* ---------- global events ---------- */
-    // click outside suggestions closes it
-    document.addEventListener('click', (e) => {
+      // mount suggestions and other small things
       const suggestions = document.getElementById('suggestions');
-      const wrapper = document.querySelector('.search-wrapper');
-      if(suggestions && wrapper && !wrapper.contains(e.target)) suggestions.classList.add('hidden');
-    });
-    // keyboard shortucts
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape'){ closeModal(); const chat = document.getElementById('chatbot-modal'); if(chat && !chat.classList.contains('hidden')) toggleChatbot(); }
-      if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){ e.preventDefault(); document.getElementById('search-box')?.focus(); document.getElementById('search-box')?.select(); }
-    });
+      if(suggestions) suggestions.addEventListener('click', e => { if(e.target.classList.contains('item')) suggestions.classList.add('hidden'); });
 
-    // expose functions used inline
-    window.debouncedSuggestions = debouncedSuggestions;
-    window.selectSuggestion = selectSuggestion;
-    window.searchProducts = searchProducts;
-    window.toggleChatbot = toggleChatbot;
-    window.handleChatSubmit = handleChatSubmit;
-    window.showModal = showModal;
-    window.showToast = showToast;
-    window.route = route;
+      // if on cart page, attach qty input change listeners (so changeQty works)
+      const cartList = document.getElementById('cart-list');
+      if(cartList) {
+        $$('#cart-list input[type="number"]').forEach(inp => {
+          inp.addEventListener('change', (e) => {
+            const idx = parseInt(inp.id.split('-')[1]);
+            const v = parseInt(inp.value) || 1;
+            const cart = loadCart();
+            if(cart[idx]) { cart[idx].quantity = Math.max(1, v); saveCart(cart); renderCurrentRoute(); }
+          });
+        });
+      }
 
-    // init
-    document.addEventListener('DOMContentLoaded', () => {
-      route('home');
-    });
+      // on place order page, no extra hooks needed
+      // on login page, render OTP boxes if user already has been sent OTP earlier
+      if(page === 'login') {
+        renderOTPBoxesIfNeeded();
+      }
+    }, 60);
+  }
+
+  function renderOTPBoxesIfNeeded(){
+    // if otp-boxes absent or empty and user has data, render
+    const boxes = document.getElementById('otp-boxes');
+    if(!boxes) return;
+    if(boxes.children.length === 0 && (localStorage.getItem('user_email') || document.getElementById('login-email')?.value)){
+      renderOTPBoxes();
+    }
+  }
+
+  // -------------------------
+  // Boot
+  // -------------------------
+  window.addEventListener('hashchange', renderCurrentRoute);
+  document.addEventListener('click', (e) => {
+    // close suggestions when clicking outside
+    const suggestions = document.getElementById('suggestions');
+    const wrapper = document.querySelector('.search-wrapper');
+    if(suggestions && wrapper && !wrapper.contains(e.target)) suggestions.classList.add('hidden');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){ closeModal(); const chat = document.getElementById('chatbot-modal'); if(chat && !chat.classList.contains('hidden')) toggleChatbot(); }
+    if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){ e.preventDefault(); document.getElementById('search-box')?.focus(); document.getElementById('search-box')?.select(); }
+  });
+
+  // expose functions that may be used inline
+  window.navigateHash = navigateHash;
+  window.addToCart = addToCart;
+  window.changeQty = changeQty;
+  window.removeCartItem = removeCartItem;
+  window.searchProducts = searchProducts;
+  window.debouncedSuggestions = debouncedSuggestions;
+  window.selectSuggestion = selectSuggestion;
+  window.doProductsSearch = doProductsSearch;
+  window.toggleChatbot = toggleChatbot;
+  window.handleChatSubmit = handleChatSubmit;
+  window.buyNow = buyNow;
+  window.validateAndPlaceCart = validateAndPlaceCart;
+  window.sendOrderToTelegram = sendOrderToTelegram;
+  window.sendOTP = sendOTP;
+  window.verifyOTP = verifyOTP;
+  window.logout = logout;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
+    if(!location.hash) location.hash = 'home';
+    renderCurrentRoute();
+  });
   </script>
-
+  <script src="app.js" defer></script>
 </body>
 </html>
